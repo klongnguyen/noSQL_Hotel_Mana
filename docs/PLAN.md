@@ -74,12 +74,6 @@ noSQL_Hotel_Mana/
 └── .gitignore
 ```
 
-## 6. Tiến độ đề xuất
-- **Ngày 1-3:** M1 + thiết kế Query-First + schema CQL.
-- **Ngày 4-9:** M2 đến M7.
-- **Ngày 10-12:** M8 + tích hợp + sửa lỗi.
-- **Ngày 13-14:** Test, README, báo cáo và demo.
-
 ## 7. Lưu ý
 - Không commit Astra DB Application Token hoặc Secure Connect Bundle lên GitHub.
 - Booking là module quan trọng nhất, cần đảm bảo dữ liệu được ghi đúng vào các bảng denormalized liên quan.
