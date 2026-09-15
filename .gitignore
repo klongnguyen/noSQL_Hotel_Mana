@@ -1,0 +1,15 @@
+# ASP.NET Core
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Environment / secrets
+.env
+appsettings.Development.json
+secure-connect-*.zip
+
+# OS
+.DS_Store
+Thumbs.db
