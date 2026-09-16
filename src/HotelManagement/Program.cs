@@ -1,4 +1,10 @@
+using HotelManagement.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Cấu hình Cassandra Astra DB Settings & Context Singleton
+builder.Services.Configure<CassandraSettings>(builder.Configuration.GetSection("Cassandra"));
+builder.Services.AddSingleton<ICassandraContext, CassandraContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
