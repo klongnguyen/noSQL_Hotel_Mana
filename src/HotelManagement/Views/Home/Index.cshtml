@@ -1,8 +1,151 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model HotelManagement.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Hotel Management - Astra DB Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h1 class="h2 mb-1 text-primary fw-bold">🏨 Hotel Management System</h1>
+            <p class="text-muted mb-0">Hệ thống quản lý khách sạn phân tán với DataStax Astra DB &amp; ASP.NET Core 9</p>
+        </div>
+        <div>
+            @if (Model.IsConnected)
+            {
+                <span class="badge bg-success fs-6 px-3 py-2 shadow-sm">
+                    🟢 Astra DB Connected: <strong>@Model.Keyspace</strong>
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-danger fs-6 px-3 py-2 shadow-sm">
+                    🔴 Database Disconnected
+                </span>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger shadow-sm" role="alert">
+            <h5 class="alert-heading">⚠️ Lỗi kết nối Cassandra:</h5>
+            <p class="mb-0">@Model.ErrorMessage</p>
+        </div>
+    }
+
+    <!-- Stat Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary bg-opacity-10 text-primary">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-semibold mb-1 small">Khách sạn</p>
+                            <h2 class="display-6 fw-bold mb-0">@Model.HotelCount</h2>
+                        </div>
+                        <div class="fs-1">🏢</div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Bảng: <code>hotels</code></small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-success bg-opacity-10 text-success">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-semibold mb-1 small">Phòng nghỉ</p>
+                            <h2 class="display-6 fw-bold mb-0">@Model.RoomCount</h2>
+                        </div>
+                        <div class="fs-1">🛏️</div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Bảng: <code>rooms_by_hotel</code></small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-warning bg-opacity-10 text-dark">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-semibold mb-1 small">Khách hàng</p>
+                            <h2 class="display-6 fw-bold mb-0">@Model.GuestCount</h2>
+                        </div>
+                        <div class="fs-1">👥</div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Bảng: <code>guests</code></small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-info bg-opacity-10 text-info">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-semibold mb-1 small">Lượt đặt phòng</p>
+                            <h2 class="display-6 fw-bold mb-0">@Model.BookingCount</h2>
+                        </div>
+                        <div class="fs-1">📅</div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Bảng: <code>bookings_by_guest</code></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thông tin hệ thống & Phân công Module -->
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h5 class="fw-bold mb-0 text-dark">🎯 Trạng thái Kiến trúc NoSQL Query-First</h5>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Keyspace:</strong> <span class="badge bg-secondary">@Model.Keyspace</span>
+                            </div>
+                            <span class="text-muted small">DataStax Astra DB Cloud</span>
+                        </li>
+                        <li class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Cassandra Release Version:</strong> <code>@(Model.ReleaseVersion ?? "Cassandra 4.0 compatible")</code>
+                            </div>
+                            <span class="text-success small">Đã xác thực</span>
+                        </li>
+                        <li class="list-group-item px-0 py-3">
+                            <strong>Driver C#:</strong> <code>CassandraCSharpDriver v3.22.1</code> với kết nối Cloud Secure Bundle.
+                        </li>
+                        <li class="list-group-item px-0 py-3">
+                            <strong>Thiết kế tối ưu:</strong> 7 bảng truy vấn độc lập, hạn chế JOIN, ghi đồng bộ <code>BatchStatement</code> (Dual-Write).
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-light">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h5 class="fw-bold mb-0 text-dark">👥 Phân chia Module Nhóm 3 Người</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3 p-3 bg-white rounded-3 shadow-xs border-start border-4 border-primary">
+                        <strong class="text-primary d-block">Thành viên 1 (M2 + M3):</strong>
+                        <span class="small text-muted">Quản lý Khách sạn &amp; Phòng (Lọc trạng thái không dùng ALLOW FILTERING).</span>
+                    </div>
+                    <div class="mb-3 p-3 bg-white rounded-3 shadow-xs border-start border-4 border-warning">
+                        <strong class="text-warning d-block">Thành viên 2 (M4 + M5):</strong>
+                        <span class="small text-muted">Quản lý Khách hàng &amp; Nghiệp vụ Đặt phòng Dual-Write đồng bộ 2 bảng.</span>
+                    </div>
+                    <div class="p-3 bg-white rounded-3 shadow-xs border-start border-4 border-info">
+                        <strong class="text-info d-block">Thành viên 3 (M6 + M7 + M8):</strong>
+                        <span class="small text-muted">Tra cứu Query-First 2 chiều, Quản lý Hóa đơn &amp; Dashboard tổng quan.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
