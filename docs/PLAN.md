@@ -22,32 +22,59 @@ Trọng tâm:
 | M7. Invoice | Tạo và tra cứu hóa đơn | `invoices_by_booking` |
 | M8. UI & Integration | Bootstrap, ghép module, kiểm thử | Website hoàn chỉnh |
 
-## 3. Phân công gợi ý cho nhóm 3 người
-- **Thành viên 1:** M1 + M2 + M3
-- **Thành viên 2:** M4 + M5
-- **Thành viên 3:** M6 + M7 + M8
+## 3. Phân công chi tiết cho nhóm 3 người (Làm việc song song độc lập)
 
-Cả nhóm cùng thực hiện:
-- Thiết kế schema CQL.
-- Seed dữ liệu mẫu.
-- Kiểm thử tích hợp.
-- Báo cáo và demo.
+### 👤 Thành viên 1: Quản lý Khách sạn & Phòng (M1 + M2 + M3)
+- **Bảng phụ trách**: `hotels`, `rooms_by_hotel`, `rooms_by_hotel_status`.
+- **Mã nguồn tự quản lý**:
+  - `Data/` (`CassandraContext.cs`, cấu hình kết nối ban đầu M1)
+  - `Models/Hotel.cs`, `Models/Room.cs`
+  - `Repositories/IHotelRepository.cs`, `HotelRepository.cs`
+  - `Repositories/IRoomRepository.cs`, `RoomRepository.cs`
+  - `Controllers/HotelsController.cs`, `Controllers/RoomsController.cs`
+  - `Views/Hotels/`, `Views/Rooms/`
+  - `Extensions/HotelModuleExtensions.cs`
+- **Nhiệm vụ trọng tâm**: Truy vấn phòng theo trạng thái bằng bảng `rooms_by_hotel_status` (Query-First, không dùng ALLOW FILTERING).
 
-## 4. Thứ tự thực hiện
+---
 
-```text
-M1 Cassandra Setup
-       ↓
-M2 Hotel ── M3 Room ── M4 Guest
-                     ↓
-                  M5 Booking
-                     ↓
-              M6 Booking Query
-                     ↓
-                  M7 Invoice
-                     ↓
-               M8 Integration
-```
+### 👤 Thành viên 2: Khách hàng & Nghiệp vụ Booking (M4 + M5)
+- **Bảng phụ trách**: `guests`, `bookings_by_guest`, `bookings_by_hotel_date`.
+- **Mã nguồn tự quản lý**:
+  - `Models/Guest.cs`, `Models/Booking.cs`
+  - `ViewModels/CreateBookingViewModel.cs`
+  - `Repositories/IGuestRepository.cs`, `GuestRepository.cs`
+  - `Repositories/IBookingRepository.cs`, `BookingRepository.cs`
+  - `Controllers/GuestsController.cs`, `Controllers/BookingsController.cs`
+  - `Views/Guests/`, `Views/Bookings/`
+  - `Extensions/BookingModuleExtensions.cs`
+- **Nhiệm vụ trọng tâm**: Thực hiện **Denormalization / Dual-Write** (ghi đồng thời vào `bookings_by_guest` và `bookings_by_hotel_date` bằng BatchStatement) và cập nhật trạng thái phòng.
+
+---
+
+### 👤 Thành viên 3: Tra cứu Booking, Hóa đơn & Giao diện (M6 + M7 + M8)
+- **Bảng phụ trách**: `invoices_by_booking`, đọc dữ liệu `bookings_by_guest`, `bookings_by_hotel_date`.
+- **Mã nguồn tự quản lý**:
+  - `Models/Invoice.cs`
+  - `ViewModels/BookingQueryViewModel.cs`, `ViewModels/DashboardViewModel.cs`
+  - `Repositories/IInvoiceRepository.cs`, `InvoiceRepository.cs`
+  - `Services/IBookingQueryService.cs`, `BookingQueryService.cs`
+  - `Controllers/InvoicesController.cs`, `Controllers/BookingQueriesController.cs`, `Controllers/HomeController.cs`
+  - `Views/Invoices/`, `Views/BookingQueries/`, `Views/Home/`, `Views/Shared/_Layout.cshtml`
+  - `Extensions/InvoiceModuleExtensions.cs`
+- **Nhiệm vụ trọng tâm**: Tra cứu lịch sử đặt phòng theo khách / ngày; lập và xem hóa đơn; thiết kế giao diện Bootstrap chung & Dashboard thống kê hệ thống.
+
+---
+
+## 4. Quy trình phối hợp Git song song
+
+1. **Bước 0**: Tạo khung project `HotelManagement` + `CassandraContext` dùng chung đưa lên nhánh `main`.
+2. **Bước 1**: Mỗi thành viên tạo branch riêng:
+   - Thành viên 1: `git checkout -b feature/hotel-room`
+   - Thành viên 2: `git checkout -b feature/guest-booking`
+   - Thành viên 3: `git checkout -b feature/query-invoice-ui`
+3. **Bước 2**: Từng người code trọn vẹn module của mình (do file và thư mục tách biệt hoàn toàn nên không bị conflict).
+4. **Bước 3**: Lần lượt tạo Pull Request / Merge vào `main`, test tích hợp toàn diện.
 
 ## 5. Cấu trúc thư mục
 

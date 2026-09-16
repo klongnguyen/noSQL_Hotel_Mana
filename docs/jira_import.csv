@@ -1,0 +1,16 @@
+Issue Type,Summary,Description,Priority
+Epic,[EPIC-1] M1: System Foundation & Astra DB Setup - Phụ trách: Thành viên 1,"Thiết lập kết nối DataStax Astra DB (Keyspace hotel_ks) và khởi tạo kiến trúc project ASP.NET Core 9 MVC.",Highest
+Epic,[EPIC-2] M2 + M3: Hotel & Room Catalog Management - Phụ trách: Thành viên 1,"Quản lý danh mục khách sạn (hotels) và tra cứu phòng (rooms_by_hotel, rooms_by_hotel_status) tối ưu NoSQL không dùng ALLOW FILTERING.",High
+Epic,[EPIC-3] M4 + M5: Guest Management & Booking Core - Phụ trách: Thành viên 2,"Quản lý khách hàng (guests) và nghiệp vụ đặt phòng đồng bộ dữ liệu Dual-Write NoSQL (bookings_by_guest, bookings_by_hotel_date).",Highest
+Epic,[EPIC-4] M6 + M7 + M8: Query Invoicing & Dashboard UI - Phụ trách: Thành viên 3,"Tra cứu Query-First 2 chiều, quản lý hóa đơn (invoices_by_booking), Layout hệ thống và Dashboard tổng quan.",High
+Task,[TV1][2 pts] TASK-101: Khởi tạo ASP.NET Core 9 MVC project và cài đặt CassandraCSharpDriver,"Khởi tạo project trong src/HotelManagement, cài đặt package CassandraCSharpDriver (>=3.20.0), kiểm tra build và cấu hình gitignore.",Highest
+Task,[TV1][3 pts] TASK-102: Xây dựng CassandraContext Singleton kết nối Astra DB,"Tạo CassandraSettings.cs và CassandraContext.cs quản lý ISession duy nhất kết nối Astra DB với keyspace hotel_ks, đăng ký DI Singleton trong Program.cs.",Highest
+Story,[TV1][5 pts] STORY-103: Quản lý danh sách và thông tin chi tiết Khách sạn,"Hiện thực Model Hotel, IHotelRepository, HotelsController và View Razor danh sách/chi tiết khách sạn từ bảng hotels.",High
+Story,[TV1][3 pts] STORY-104: Quản lý và tra cứu phòng theo khách sạn,"Hiện thực truy vấn danh sách phòng thuộc khách sạn từ bảng rooms_by_hotel (PK: hotel_id, CK: room_number).",High
+Story,[TV1][5 pts] STORY-105: Lọc danh sách phòng theo trạng thái không dùng ALLOW FILTERING,"Hiện thực truy vấn tối ưu từ bảng rooms_by_hotel_status (PK: hotel_id, status, CK: room_number) cho phép lọc AVAILABLE, OCCUPIED, MAINTENANCE.",High
+Story,[TV2][5 pts] STORY-201: Quản lý thông tin Khách hàng (CRUD),"Hiện thực Model Guest, IGuestRepository, GuestsController và các View CRUD khách hàng từ bảng guests.",High
+Story,[TV2][8 pts] STORY-202: Nghiệp vụ Đặt phòng với kỹ thuật Denormalization Dual-Write,"Sử dụng BatchStatement ghi đồng thời vào cả 2 bảng bookings_by_guest và bookings_by_hotel_date, đồng thời cập nhật trạng thái phòng sang OCCUPIED.",Highest
+Story,[TV2][3 pts] STORY-203: Hủy đặt phòng và hoàn trả trạng thái phòng,"Cập nhật trạng thái CANCELLED trên cả 2 bảng booking và chuyển trạng thái phòng trong rooms_by_hotel về AVAILABLE.",Medium
+Story,[TV3][5 pts] STORY-301: Module Tra cứu Lịch sử đặt phòng (Query-First),"Tra cứu 2 chiều: theo guest_id từ bảng bookings_by_guest và theo hotel_id + check_in_date từ bảng bookings_by_hotel_date.",High
+Story,[TV3][5 pts] STORY-302: Quản lý và Xuất Hóa đơn theo Booking,"Truy vấn và hiển thị hóa đơn chi tiết (tiền phòng, thuế, phụ phí) từ bảng invoices_by_booking.",High
+Story,[TV3][6 pts] STORY-303: Thiết kế Master Layout Navigation Bar & Dashboard Thống kê,"Xây dựng Views/Shared/_Layout.cshtml với Menu điều hướng chung và Dashboard trang chủ HomeController/Index hiển thị thống kê hệ thống.",Highest
