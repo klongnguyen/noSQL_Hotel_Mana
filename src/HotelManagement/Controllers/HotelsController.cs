@@ -8,11 +8,16 @@ namespace HotelManagement.Controllers;
 public class HotelsController : Controller
 {
     private readonly IHotelRepository _hotelRepository;
+    private readonly IRoomRepository _roomRepository;
     private readonly ILogger<HotelsController> _logger;
 
-    public HotelsController(IHotelRepository hotelRepository, ILogger<HotelsController> logger)
+    public HotelsController(
+        IHotelRepository hotelRepository,
+        IRoomRepository roomRepository,
+        ILogger<HotelsController> logger)
     {
         _hotelRepository = hotelRepository;
+        _roomRepository = roomRepository;
         _logger = logger;
     }
 
@@ -91,6 +96,11 @@ public class HotelsController : Controller
                 ViewBag.HotelId = id;
                 return View("HotelNotFound");
             }
+
+            // Lấy danh sách phòng thuộc khách sạn này từ bảng rooms_by_hotel
+            var rooms = (await _roomRepository.GetRoomsByHotelAsync(id)).ToList();
+            ViewBag.FeaturedRooms = rooms.Take(2).ToList();
+            ViewBag.TotalRooms = rooms.Count;
 
             return View(hotel);
         }
