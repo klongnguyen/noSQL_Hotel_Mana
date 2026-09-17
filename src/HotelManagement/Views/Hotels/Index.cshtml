@@ -1,0 +1,208 @@
+@model HotelManagement.ViewModels.HotelListViewModel
+@{
+    ViewData["Title"] = "Danh Sách Khách Sạn";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header & Giới thiệu -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="p-4 p-md-5 rounded-4 shadow-sm text-white" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                <div class="d-md-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-semibold mb-2">
+                            <i class="bi bi-building"></i> Module M2: Hotel Catalog
+                        </span>
+                        <h1 class="display-6 fw-bold mb-2">Khám Phá & Đặt Phòng Khách Sạn</h1>
+                        <p class="lead mb-0 text-white-50">
+                            Hệ thống quản trị và tra cứu khách sạn tối ưu trên kiến trúc CSDL phân tán <strong>Apache Cassandra / DataStax Astra DB</strong>.
+                        </p>
+                    </div>
+                    <div class="mt-3 mt-md-0 text-md-end">
+                        <div class="bg-white bg-opacity-10 border border-light border-opacity-25 rounded-3 p-3 text-start">
+                            <small class="text-white-50 d-block">Mô hình truy vấn (Query-First):</small>
+                            <span class="badge bg-success font-monospace">
+                                @(string.IsNullOrEmpty(Model.SelectedCity) ? "TABLE: hotels (ALL)" : $"TABLE: hotels_by_city WHERE city = '{Model.SelectedCity}'")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thanh công cụ tìm kiếm & bộ lọc Query-First -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form method="get" asp-controller="Hotels" asp-action="Index" class="row g-3 align-items-end">
+                <!-- Lọc theo Thành phố (Query-First Partition Key) -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold text-secondary">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> Thành phố (Partition Key):
+                    </label>
+                    <select name="city" class="form-select form-select-lg rounded-3 shadow-none border-secondary-subtle">
+                        <option value="">-- Tất cả thành phố --</option>
+                        @foreach (var c in Model.AvailableCities)
+                        {
+                            <option value="@c" selected="@(Model.SelectedCity == c)">@c</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Lọc theo Số sao -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold text-secondary">
+                        <i class="bi bi-star-fill text-warning me-1"></i> Số sao tối thiểu:
+                    </label>
+                    <select name="starRating" class="form-select form-select-lg rounded-3 shadow-none border-secondary-subtle">
+                        <option value="">-- Mọi số sao --</option>
+                        <option value="5" selected="@(Model.SelectedStarRating == 5)">5 Sao (★★★★★)</option>
+                        <option value="4" selected="@(Model.SelectedStarRating == 4)">4 Sao (★★★★☆)</option>
+                        <option value="3" selected="@(Model.SelectedStarRating == 3)">3 Sao (★★★☆☆)</option>
+                    </select>
+                </div>
+
+                <!-- Tìm kiếm theo tên / địa chỉ -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold text-secondary">
+                        <i class="bi bi-search text-primary me-1"></i> Từ khóa:
+                    </label>
+                    <input type="text" name="search" value="@Model.SearchKeyword" class="form-control form-select-lg rounded-3 shadow-none border-secondary-subtle" placeholder="Tên khách sạn, đường..." />
+                </div>
+
+                <!-- Nút bấm Tìm kiếm & Reset -->
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-3 flex-grow-1 shadow-sm fw-semibold">
+                        Lọc
+                    </button>
+                    @if (!string.IsNullOrEmpty(Model.SelectedCity) || Model.SelectedStarRating.HasValue || !string.IsNullOrEmpty(Model.SearchKeyword))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg rounded-3" title="Xóa bộ lọc">
+                            ✕
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thanh thống kê kết quả -->
+    <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+        <div>
+            <span class="text-secondary">Tìm thấy</span>
+            <strong class="text-primary fs-5">@Model.TotalCount</strong>
+            <span class="text-secondary">khách sạn phù hợp</span>
+            @if (!string.IsNullOrEmpty(Model.SelectedCity))
+            {
+                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle ms-2 px-2 py-1">
+                    Tại: @Model.SelectedCity
+                </span>
+            }
+            @if (Model.SelectedStarRating.HasValue)
+            {
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1 px-2 py-1">
+                    @Model.SelectedStarRating.Value Sao
+                </span>
+            }
+        </div>
+        <div class="text-muted small">
+            <span class="badge bg-light text-dark border">
+                Zero ALLOW FILTERING
+            </span>
+        </div>
+    </div>
+
+    <!-- Danh sách Khách sạn (Card Grid) -->
+    @if (Model.Hotels.Any())
+    {
+        <div class="row g-4">
+            @foreach (var hotel in Model.Hotels)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hotel-card">
+                        <!-- Banner đầu thẻ Card -->
+                        <div class="card-header border-0 p-4 text-white position-relative" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); min-height: 120px;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="badge bg-light text-dark fw-bold px-3 py-1 rounded-pill">
+                                    @hotel.HotelId
+                                </span>
+                                <span class="badge bg-warning text-dark fw-bold px-2 py-1 rounded-pill">
+                                    @hotel.StarRating ★
+                                </span>
+                            </div>
+                            <h5 class="card-title fw-bold text-white mt-3 mb-0 text-truncate" title="@hotel.HotelName">
+                                @hotel.HotelName
+                            </h5>
+                        </div>
+
+                        <!-- Thân thẻ Card -->
+                        <div class="card-body p-4 d-flex flex-column justify-content-between">
+                            <div>
+                                <!-- Đánh giá số sao trực quan -->
+                                <div class="mb-2">
+                                    <span class="text-warning fs-5">@hotel.StarDisplay</span>
+                                    <span class="text-muted small ms-1">(@hotel.StarRating sao)</span>
+                                </div>
+
+                                <!-- Địa chỉ -->
+                                <p class="card-text text-secondary mb-2 small">
+                                    <strong class="text-dark d-block mb-1">
+                                        <i class="bi bi-geo-alt text-danger me-1"></i> @hotel.City
+                                    </strong>
+                                    <span>@hotel.Address</span>
+                                </p>
+
+                                <!-- Hotline -->
+                                <p class="card-text text-secondary small mb-3">
+                                    <i class="bi bi-telephone text-success me-1"></i>
+                                    <a href="tel:@hotel.Phone" class="text-decoration-none text-secondary">
+                                        @hotel.Phone
+                                    </a>
+                                </p>
+                            </div>
+
+                            <!-- Nút thao tác -->
+                            <div class="pt-3 border-top d-flex gap-2">
+                                <a asp-controller="Hotels" asp-action="Details" asp-route-id="@hotel.HotelId" 
+                                   class="btn btn-outline-primary rounded-3 flex-grow-1 fw-semibold btn-sm py-2">
+                                    Chi tiết
+                                </a>
+                                <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@hotel.HotelId" 
+                                   class="btn btn-primary rounded-3 flex-grow-1 fw-semibold btn-sm py-2"
+                                   title="Xem danh sách phòng của khách sạn này">
+                                    Xem phòng
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Empty State -->
+        <div class="card border-0 shadow-sm rounded-4 text-center p-5 my-4">
+            <div class="my-4">
+                <div class="display-1 text-muted mb-3">🏨</div>
+                <h4 class="fw-bold text-dark">Không tìm thấy khách sạn nào</h4>
+                <p class="text-secondary max-w-md mx-auto">
+                    Không có khách sạn nào khớp với điều kiện lọc hiện tại. Hãy thử chọn lại thành phố hoặc mức sao khác.
+                </p>
+                <a asp-action="Index" class="btn btn-primary rounded-pill px-4 py-2 mt-2 fw-semibold">
+                    Xem tất cả khách sạn
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .hotel-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .hotel-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.12) !important;
+    }
+</style>
