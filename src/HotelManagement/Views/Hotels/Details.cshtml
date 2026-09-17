@@ -97,9 +97,11 @@
                                             <div class="fw-bold text-dark">@rm.RoomType</div>
                                             <small class="text-primary fw-semibold">@rm.PriceFormatted / đêm</small>
                                         </div>
-                                        <span class="badge @rm.StatusBadgeClass px-2 py-1 small">
-                                            @rm.StatusDisplay
-                                        </span>
+                                        <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" asp-route-status="@rm.Status" 
+                                           class="badge @rm.StatusBadgeClass px-2 py-1 small text-decoration-none" 
+                                           title="Xem danh sách phòng @rm.StatusDisplay của khách sạn này (Story-105)">
+                                            <i class="bi @rm.StatusIcon me-1"></i>@rm.StatusDisplay &rarr;
+                                        </a>
                                     </div>
                                 </div>
                             }

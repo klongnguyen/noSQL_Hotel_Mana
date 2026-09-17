@@ -12,6 +12,7 @@ public class RoomRepository : IRoomRepository
 
     private PreparedStatement? _getRoomsByHotelStmt;
     private PreparedStatement? _getRoomByNumberStmt;
+    private PreparedStatement? _getRoomsByStatusStmt;
     private readonly SemaphoreSlim _initLock = new(1, 1);
 
     public RoomRepository(ICassandraContext context, ILogger<RoomRepository> logger)
@@ -22,7 +23,7 @@ public class RoomRepository : IRoomRepository
 
     private async Task EnsurePreparedStatementsAsync()
     {
-        if (_getRoomsByHotelStmt != null && _getRoomByNumberStmt != null)
+        if (_getRoomsByHotelStmt != null && _getRoomByNumberStmt != null && _getRoomsByStatusStmt != null)
         {
             return;
         }
@@ -40,6 +41,12 @@ public class RoomRepository : IRoomRepository
             {
                 _getRoomByNumberStmt = await _context.Session.PrepareAsync(
                     "SELECT hotel_id, room_number, room_type, price_per_night, status FROM rooms_by_hotel WHERE hotel_id = ? AND room_number = ?;");
+            }
+
+            if (_getRoomsByStatusStmt == null)
+            {
+                _getRoomsByStatusStmt = await _context.Session.PrepareAsync(
+                    "SELECT hotel_id, status, room_number, room_type, price_per_night FROM rooms_by_hotel_status WHERE hotel_id = ? AND status = ?;");
             }
         }
         catch (Exception ex)
@@ -83,6 +90,25 @@ public class RoomRepository : IRoomRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Lỗi khi lấy thông tin phòng {RoomNumber} tại khách sạn {HotelId}", roomNumber, hotelId);
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<Room>> GetRoomsByStatusAsync(string hotelId, string status)
+    {
+        await EnsurePreparedStatementsAsync();
+        try
+        {
+            // Truy vấn Composite Partition Key: (hotel_id, status), Clustering Key: room_number ASC
+            // Chuẩn thiết kế Query-First NoSQL: 100% không dùng ALLOW FILTERING
+            var normalizedStatus = status.Trim().ToUpperInvariant();
+            var bound = _getRoomsByStatusStmt!.Bind(hotelId, normalizedStatus);
+            var rowSet = await _context.Session.ExecuteAsync(bound);
+            return rowSet.Select(MapRowToRoom).ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Lỗi khi lọc danh sách phòng theo trạng thái {Status} cho khách sạn ID: {HotelId}", status, hotelId);
             throw;
         }
     }

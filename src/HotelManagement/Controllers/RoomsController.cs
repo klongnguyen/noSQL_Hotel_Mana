@@ -22,10 +22,11 @@ public class RoomsController : Controller
     }
 
     /// <summary>
-    /// Trang quản lý và tra cứu danh sách phòng theo Khách sạn (Module M3 - STORY-104)
+    /// Trang quản lý và tra cứu danh sách phòng theo Khách sạn (Module M3 - STORY-104 & STORY-105)
+    /// Hỗ trợ lọc trạng thái (AVAILABLE, OCCUPIED, MAINTENANCE) thông qua bảng NoSQL rooms_by_hotel_status
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Index(string? hotelId)
+    public async Task<IActionResult> Index(string? hotelId, string? status)
     {
         try
         {
@@ -42,21 +43,55 @@ public class RoomsController : Controller
             var currentHotel = hotels.FirstOrDefault(h => h.HotelId == hotelId)
                                ?? await _hotelRepository.GetHotelByIdAsync(hotelId);
 
-            var rooms = await _roomRepository.GetRoomsByHotelAsync(hotelId);
+            // 1. Nạp danh sách toàn bộ phòng thuộc khách sạn để tổng hợp số liệu KPI tổng thể
+            var allHotelRooms = (await _roomRepository.GetRoomsByHotelAsync(hotelId)).ToList();
+            var totalRooms = allHotelRooms.Count;
+            var availableCount = allHotelRooms.Count(r => r.Status.Equals("AVAILABLE", StringComparison.OrdinalIgnoreCase));
+            var occupiedCount = allHotelRooms.Count(r => r.Status.Equals("OCCUPIED", StringComparison.OrdinalIgnoreCase));
+            var maintenanceCount = allHotelRooms.Count(r => r.Status.Equals("MAINTENANCE", StringComparison.OrdinalIgnoreCase));
+
+            // 2. Kiểm tra điều kiện lọc theo Trạng thái (Story-105)
+            IEnumerable<Room> displayRooms;
+            string querySourceTable;
+            string executedCql;
+            var isFilteringStatus = !string.IsNullOrWhiteSpace(status) && !status.Equals("ALL", StringComparison.OrdinalIgnoreCase);
+
+            if (isFilteringStatus)
+            {
+                var normStatus = status!.Trim().ToUpperInvariant();
+                // Query trực tiếp vào bảng chuyên dụng rooms_by_hotel_status (Chuẩn Query-First, KHÔNG dùng ALLOW FILTERING)
+                displayRooms = await _roomRepository.GetRoomsByStatusAsync(hotelId, normStatus);
+                querySourceTable = "rooms_by_hotel_status";
+                executedCql = $"SELECT hotel_id, status, room_number, room_type, price_per_night FROM rooms_by_hotel_status WHERE hotel_id = '{hotelId}' AND status = '{normStatus}';";
+            }
+            else
+            {
+                // Mặc định lấy từ bảng rooms_by_hotel
+                displayRooms = allHotelRooms;
+                querySourceTable = "rooms_by_hotel";
+                executedCql = $"SELECT hotel_id, room_number, room_type, price_per_night, status FROM rooms_by_hotel WHERE hotel_id = '{hotelId}';";
+            }
 
             var viewModel = new RoomListViewModel
             {
                 SelectedHotelId = hotelId,
+                SelectedStatus = isFilteringStatus ? status!.Trim().ToUpperInvariant() : "ALL",
                 CurrentHotel = currentHotel,
                 AvailableHotels = hotels,
-                Rooms = rooms
+                Rooms = displayRooms,
+                QuerySourceTable = querySourceTable,
+                ExecutedCqlQuery = executedCql,
+                TotalRooms = totalRooms,
+                AvailableCount = availableCount,
+                OccupiedCount = occupiedCount,
+                MaintenanceCount = maintenanceCount
             };
 
             return View(viewModel);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Lỗi khi nạp danh sách phòng cho khách sạn ID: {HotelId}", hotelId);
+            _logger.LogError(ex, "Lỗi khi nạp danh sách phòng cho khách sạn ID: {HotelId}, status: {Status}", hotelId, status);
             TempData["ErrorMessage"] = $"Lỗi khi tải danh sách phòng của khách sạn {hotelId}.";
             return View(new RoomListViewModel());
         }
