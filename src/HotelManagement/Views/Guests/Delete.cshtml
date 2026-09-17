@@ -1,0 +1,15 @@
+@model HotelManagement.Models.Guest
+@{ ViewData["Title"] = "Xóa khách hàng"; }
+<div class="container" style="max-width:700px">
+    <h2 class="mb-4 text-danger">Xóa khách hàng</h2>
+    <div class="alert alert-warning">Bạn có chắc muốn xóa khách hàng <strong>@Model.FullName</strong> (@Model.GuestId)?</div>
+    <dl class="row">
+        <dt class="col-sm-4">Số điện thoại</dt><dd class="col-sm-8">@Model.Phone</dd>
+        <dt class="col-sm-4">Email</dt><dd class="col-sm-8">@Model.Email</dd>
+    </dl>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.GuestId" />
+        <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>

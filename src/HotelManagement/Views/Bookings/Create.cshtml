@@ -1,0 +1,62 @@
+@model HotelManagement.Models.Booking
+@{
+    ViewData["Title"] = "Đặt phòng mới";
+}
+
+<div class="container" style="max-width:850px">
+    <div class="mb-4">
+        <div class="text-muted small">Nghiệp vụ M5</div>
+        <h2 class="h3 fw-bold">Đặt phòng mới</h2>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Dual-Write:</strong> Khi đặt phòng, hệ thống sẽ ghi đồng thời vào
+        <code>bookings_by_guest</code> và <code>bookings_by_hotel_date</code>,
+        đồng thời chuyển phòng sang <code>OCCUPIED</code>.
+    </div>
+
+    <form asp-action="Create" method="post" class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="GuestId" class="form-label fw-semibold">Mã khách hàng</label>
+                    <input asp-for="GuestId" class="form-control" placeholder="GUEST001" required />
+                    <div class="form-text">Ví dụ: GUEST001</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="HotelId" class="form-label fw-semibold">Mã khách sạn</label>
+                    <input asp-for="HotelId" class="form-control" placeholder="HTL001" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="RoomNumber" class="form-label fw-semibold">Số phòng</label>
+                    <input asp-for="RoomNumber" type="number" class="form-control" min="1" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="CheckInDate" class="form-label fw-semibold">Ngày check-in</label>
+                    <input asp-for="CheckInDate" type="date" class="form-control" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="CheckOutDate" class="form-label fw-semibold">Ngày check-out</label>
+                    <input asp-for="CheckOutDate" type="date" class="form-control" required />
+                </div>
+            </div>
+
+            <hr class="my-4" />
+            <p class="text-muted small mb-0">
+                Tổng tiền được hệ thống tự tính theo giá phòng x số đêm.
+            </p>
+        </div>
+        <div class="card-footer bg-white p-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-calendar-check me-1"></i> Xác nhận đặt phòng
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
