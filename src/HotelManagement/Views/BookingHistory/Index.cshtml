@@ -1,0 +1,60 @@
+@model IEnumerable<HotelManagement.Models.BookingHistory>
+
+@{
+    ViewData["Title"] = "Tra cứu Lịch sử đặt phòng";
+}
+
+<h2>Tra cứu Lịch sử đặt phòng</h2>
+
+<!-- Form nhập liệu để gửi mã khách hàng về Controller -->
+<form method="get" action="/BookingHistory/Index" class="mb-4">
+    <div class="form-group">
+        <label for="customerId">Nhập Mã Khách Hàng (Customer ID):</label>
+        <div class="input-group mt-2" style="max-width: 400px;">
+            <input type="text" id="customerId" name="customerId" class="form-control" placeholder="Ví dụ: CUST001" required />
+            <button type="submit" class="btn btn-primary">Tra cứu</button>
+        </div>
+    </div>
+</form>
+
+<hr />
+
+<!-- Vòng lặp hiển thị kết quả nếu có dữ liệu -->
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã Booking</th>
+                <th>Tên Khách Sạn</th>
+                <th>Ngày Check-in</th>
+                <th>Ngày Check-out</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.BookingId</td>
+                    <td>@item.HotelName</td>
+                    <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.TotalAmount.ToString("N0") VNĐ</td>
+                    <td>
+                        <span class="badge @(item.Status == "Completed" ? "bg-success" : "bg-warning")">
+                            @item.Status
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info mt-3">
+        Vui lòng nhập mã khách hàng để tra cứu hoặc khách hàng này chưa có lịch sử đặt phòng.
+    </div>
+}
