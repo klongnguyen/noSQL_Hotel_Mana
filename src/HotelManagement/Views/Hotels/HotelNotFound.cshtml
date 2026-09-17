@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Không tìm thấy khách sạn";
+}
+
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-5">
+                <div class="display-1 text-warning mb-3">🔍</div>
+                <h2 class="fw-bold text-dark">Không tìm thấy khách sạn</h2>
+                <p class="text-secondary mb-4">
+                    Khách sạn với mã định danh <strong class="text-danger font-monospace">@ViewBag.HotelId</strong> không tồn tại trong hệ thống hoặc đã bị xóa.
+                </p>
+                <div>
+                    <a asp-action="Index" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold">
+                        Quay về danh sách khách sạn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

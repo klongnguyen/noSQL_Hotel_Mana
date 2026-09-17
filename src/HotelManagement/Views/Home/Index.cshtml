@@ -37,18 +37,23 @@
     <!-- Stat Cards -->
     <div class="row g-4 mb-5">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary bg-opacity-10 text-primary">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-uppercase fw-semibold mb-1 small">Khách sạn</p>
-                            <h2 class="display-6 fw-bold mb-0">@Model.HotelCount</h2>
+            <a asp-controller="Hotels" asp-action="Index" class="text-decoration-none">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary bg-opacity-10 text-primary hover-scale">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-uppercase fw-semibold mb-1 small">Khách sạn</p>
+                                <h2 class="display-6 fw-bold mb-0">@Model.HotelCount</h2>
+                            </div>
+                            <div class="fs-1">🏢</div>
                         </div>
-                        <div class="fs-1">🏢</div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <small class="text-muted">Bảng: <code>hotels</code></small>
+                            <span class="small fw-semibold text-primary">Xem tất cả &rarr;</span>
+                        </div>
                     </div>
-                    <small class="text-muted mt-2 d-block">Bảng: <code>hotels</code></small>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
             <div class="card border-0 shadow-sm rounded-4 h-100 bg-success bg-opacity-10 text-success">
