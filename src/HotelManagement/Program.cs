@@ -3,6 +3,9 @@ using HotelManagement.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// [TV3 - KAN-17] Đăng ký Repository cho module Quản lý & Xuất Hóa đơn (STORY-302)
+builder.Services.AddScoped<HotelManagement.Repositories.InvoiceRepository>();
+
 // Cấu hình Cassandra Astra DB Settings & Context Singleton
 builder.Services.Configure<CassandraSettings>(builder.Configuration.GetSection("Cassandra"));
 builder.Services.AddSingleton<ICassandraContext, CassandraContext>();
