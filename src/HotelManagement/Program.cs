@@ -3,6 +3,8 @@ using HotelManagement.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// [TV3 - KAN-17] Đăng ký Repository cho module Quản lý & Xuất Hóa đơn (STORY-302)
+builder.Services.AddScoped<HotelManagement.Repositories.InvoiceRepository>();
 // [TV3 - KAN-16] Đăng ký Repository cho module Tra cứu lịch sử đặt phòng (STORY-301)
 builder.Services.AddScoped<HotelManagement.Repositories.BookingHistoryRepository>();
 

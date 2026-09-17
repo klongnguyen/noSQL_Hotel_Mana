@@ -1,0 +1,105 @@
+@model HotelManagement.Models.Invoice
+
+@{
+    ViewData["Title"] = "Quản lý và Xuất Hóa đơn";
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary mb-4"><i class="bi bi-receipt"></i> Tra cứu Hóa đơn</h2>
+
+    <!-- Khung tìm kiếm hóa đơn -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" action="/Invoice/Index">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="bookingId" class="col-form-label fw-bold">Mã Đặt Phòng (Booking ID):</label>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="bookingId" name="bookingId" class="form-control" placeholder="Nhập mã GUID (VD: 123e4567-e89b-12d3...)" required />
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Tìm Hóa Đơn</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hiển thị thông báo lỗi (nếu có) -->
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger shadow-sm">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <!-- Khung chi tiết hóa đơn -->
+    @if (Model != null)
+    {
+        <div class="card shadow border-0" id="invoiceArea">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Chi Tiết Hóa Đơn - @Model.InvoiceId</h4>
+                <span class="badge @(Model.Status == "Paid" ? "bg-success" : "bg-warning") fs-6">
+                    @Model.Status
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h6 class="mb-3">Thông tin khách hàng:</h6>
+                        <div><strong>Khách hàng:</strong> @Model.CustomerName</div>
+                        <div><strong>Ngày lập:</strong> @Model.IssueDate.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                    <div class="col-sm-6 text-sm-end">
+                        <h6 class="mb-3">Thông tin mã đối chiếu:</h6>
+                        <div><strong>Mã Booking:</strong> @Model.BookingId</div>
+                        <div><strong>Mã Hóa đơn:</strong> @Model.InvoiceId</div>
+                    </div>
+                </div>
+
+                <div class="table-responsive-sm">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hạng Mục Phí</th>
+                                <th class="text-end">Thành Tiền (VNĐ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tiền phòng (Room Charge)</td>
+                                <td class="text-end">@Model.RoomCharge.ToString("N0")</td>
+                            </tr>
+                            <tr>
+                                <td>Thuế (Tax)</td>
+                                <td class="text-end">@Model.Tax.ToString("N0")</td>
+                            </tr>
+                            <tr>
+                                <td>Phụ phí (Additional Fees)</td>
+                                <td class="text-end">@Model.AdditionalFees.ToString("N0")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-5 ms-auto">
+                        <table class="table table-clear">
+                            <tbody>
+                                <tr>
+                                    <td class="left"><strong>Tổng Cộng:</strong></td>
+                                    <td class="right text-end text-danger fw-bold fs-5">@Model.TotalAmount.ToString("N0")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-end">
+                <button type="button" class="btn btn-success" onclick="alert('Tính năng in PDF đang được phát triển!')">
+                    <i class="bi bi-printer"></i> Xuất Hóa Đơn (PDF)
+                </button>
+            </div>
+        </div>
+    }
+</div>
