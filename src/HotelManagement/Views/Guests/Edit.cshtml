@@ -1,0 +1,30 @@
+@model HotelManagement.Models.Guest
+@{ ViewData["Title"] = "Sửa khách hàng"; }
+<div class="container" style="max-width:700px"><h2 class="mb-4">Sửa khách hàng</h2>
+<form asp-action="Edit" asp-route-id="@Model.GuestId" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <div class="mb-3">
+        <label asp-for="GuestId" class="form-label fw-semibold">Mã khách hàng</label>
+        <input asp-for="GuestId" class="form-control" readonly />
+        <span asp-validation-for="GuestId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label fw-semibold">Họ và tên</label>
+        <input asp-for="FullName" class="form-control" required />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label fw-semibold">Số điện thoại</label>
+        <input asp-for="Phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label fw-semibold">Email</label>
+        <input asp-for="Email" type="email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="NationalId" class="form-label fw-semibold">CCCD/CMND</label>
+        <input asp-for="NationalId" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form></div>

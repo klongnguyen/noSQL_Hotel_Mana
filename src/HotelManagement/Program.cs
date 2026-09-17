@@ -15,6 +15,8 @@ builder.Services.AddSingleton<ICassandraContext, CassandraContext>();
 // Đăng ký Repositories
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IGuestRepository, GuestRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

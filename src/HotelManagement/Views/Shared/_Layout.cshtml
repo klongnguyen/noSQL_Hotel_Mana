@@ -172,7 +172,7 @@
                 </a>
             </li>
             <li>
-                <a asp-controller="BookingHistory" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "BookingHistory" ? "active" : "")">
+                <a asp-controller="BookingQueries" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "BookingQueries" ? "active" : "")">
                     <i class="bi bi-search"></i> Tra Cứu Lịch Sử (M6)
                 </a>
             </li>
@@ -181,7 +181,7 @@
         <div class="sidebar-heading">Kế Toán & Thu Chi</div>
         <ul class="sidebar-nav">
             <li>
-                <a asp-controller="Invoice" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Invoice" ? "active" : "")">
+                <a asp-controller="Invoices" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Invoices" ? "active" : "")">
                     <i class="bi bi-receipt-cutoff"></i> Hóa Đơn (M7)
                 </a>
             </li>
