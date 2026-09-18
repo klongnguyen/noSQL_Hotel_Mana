@@ -1,6 +1,6 @@
 @model HotelManagement.ViewModels.RoomListViewModel
 @{
-    ViewData["Title"] = "Quản Lý Sơ Đồ Phòng Nghỉ";
+    ViewData["Title"] = "Quản Lý Phòng Nghỉ";
 }
 
 <div class="container-fluid px-0">
@@ -11,11 +11,11 @@
                 <ol class="breadcrumb mb-1 text-muted small">
                     <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
                     <li class="breadcrumb-item text-secondary">Quản lý cơ sở</li>
-                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Sơ đồ phòng nghỉ</li>
+                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Phòng nghỉ</li>
                 </ol>
             </nav>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <h1 class="h3 fw-bold text-dark mb-0">Sơ Đồ & Danh Mục Phòng Nghỉ</h1>
+                <h1 class="h3 fw-bold text-dark mb-0">Quản Lý Phòng Nghỉ</h1>
                 @if (Model.IsFilteredByStatus)
                 {
                     <span class="mono-badge-dark">
@@ -39,7 +39,7 @@
                 <label class="form-label small fw-bold text-secondary mb-1">
                     <i class="bi bi-building text-dark me-1"></i> Chọn Chi Nhánh Khách Sạn:
                 </label>
-                <select name="hotelId" class="form-select border-secondary-subtle" onchange="this.form.submit()">
+                <select name="hotelId" class="form-select mono-form-control">
                     @foreach (var h in Model.AvailableHotels)
                     {
                         <option value="@h.HotelId" selected="@(Model.SelectedHotelId == h.HotelId)">
@@ -50,36 +50,35 @@
             </div>
 
             <!-- Lọc theo Trạng thái -->
-            <div class="col-md-4 col-lg-4">
+            <div class="col-md-4 col-lg-3">
                 <label class="form-label small fw-bold text-secondary mb-1">
                     <i class="bi bi-funnel text-dark me-1"></i> Trạng Thái Vận Hành:
                 </label>
-                <div class="input-group">
-                    <select name="status" class="form-select border-secondary-subtle" onchange="this.form.submit()">
-                        <option value="ALL" selected="@(Model.SelectedStatus == "ALL" || string.IsNullOrEmpty(Model.SelectedStatus))">
-                            Tất cả trạng thái (@Model.TotalRooms)
-                        </option>
-                        <option value="AVAILABLE" selected="@(Model.SelectedStatus == "AVAILABLE")">
-                            Phòng trống / Sẵn sàng (@Model.AvailableCount)
-                        </option>
-                        <option value="OCCUPIED" selected="@(Model.SelectedStatus == "OCCUPIED")">
-                            Đang có khách (@Model.OccupiedCount)
-                        </option>
-                        <option value="MAINTENANCE" selected="@(Model.SelectedStatus == "MAINTENANCE")">
-                            Đang bảo trì / Dọn dẹp (@Model.MaintenanceCount)
-                        </option>
-                    </select>
-                    @if (Model.IsFilteredByStatus)
-                    {
-                        <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" class="mono-btn-outline" title="Xóa bộ lọc trạng thái">
-                            <i class="bi bi-x-lg"></i>
-                        </a>
-                    }
-                </div>
+                <select name="status" class="form-select mono-form-control">
+                    <option value="ALL" selected="@(Model.SelectedStatus == "ALL" || string.IsNullOrEmpty(Model.SelectedStatus))">
+                        Tất cả trạng thái (@Model.TotalRooms)
+                    </option>
+                    <option value="AVAILABLE" selected="@(Model.SelectedStatus == "AVAILABLE")">
+                        Phòng trống / Sẵn sàng (@Model.AvailableCount)
+                    </option>
+                    <option value="OCCUPIED" selected="@(Model.SelectedStatus == "OCCUPIED")">
+                        Đang có khách (@Model.OccupiedCount)
+                    </option>
+                    <option value="MAINTENANCE" selected="@(Model.SelectedStatus == "MAINTENANCE")">
+                        Đang bảo trì / Dọn dẹp (@Model.MaintenanceCount)
+                    </option>
+                </select>
+            </div>
+
+            <!-- Nút Xác Nhận Lọc -->
+            <div class="col-md-3 col-lg-2">
+                <button type="submit" class="btn mono-btn-dark w-100 fw-semibold text-nowrap">
+                    <i class="bi bi-funnel me-1"></i> Xác Nhận Lọc
+                </button>
             </div>
 
             <!-- Khung thông tin khách sạn đang chọn -->
-            <div class="col-md-3 col-lg-4 text-md-end">
+            <div class="col-md-12 col-lg-3 text-lg-end">
                 @if (Model.CurrentHotel != null)
                 {
                     <div class="d-inline-block text-start p-2 px-3 bg-light rounded-3 border small">
