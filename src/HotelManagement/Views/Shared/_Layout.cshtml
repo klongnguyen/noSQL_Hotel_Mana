@@ -3,22 +3,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Quản Trị Khách Sạn (Cassandra NoSQL)</title>
+    <title>@ViewData["Title"] - Grand Hotel Management System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
         :root {
             --admin-sidebar-width: 260px;
-            --admin-sidebar-bg: #1e293b;
-            --admin-sidebar-hover: #334155;
-            --admin-sidebar-active: #0284c7;
+            --admin-sidebar-bg: #0f172a;
+            --admin-sidebar-hover: #1e293b;
+            --admin-sidebar-active: #1e293b;
             --admin-body-bg: #f8fafc;
         }
         body {
             background-color: var(--admin-body-bg);
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-            color: #1e293b;
+            color: #0f172a;
             min-height: 100vh;
         }
         #sidebar-wrapper {
@@ -30,7 +30,7 @@
             left: 0;
             z-index: 1000;
             transition: margin-left 0.3s ease;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
         }
         #page-content-wrapper {
             margin-left: var(--admin-sidebar-width);
@@ -44,17 +44,17 @@
             font-size: 1.15rem;
             font-weight: 700;
             color: #f8fafc;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
         .sidebar-heading {
-            padding: 1rem 1.5rem 0.5rem;
+            padding: 1.1rem 1.5rem 0.4rem;
             font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: #94a3b8;
         }
         .sidebar-nav {
@@ -63,7 +63,7 @@
             margin: 0;
         }
         .sidebar-nav .nav-link {
-            padding: 0.75rem 1.5rem;
+            padding: 0.72rem 1.5rem;
             color: #cbd5e1;
             font-size: 0.92rem;
             font-weight: 500;
@@ -80,6 +80,7 @@
             color: #ffffff;
             background-color: var(--admin-sidebar-active);
             font-weight: 600;
+            box-shadow: inset 4px 0 0 #ffffff;
         }
         .sidebar-nav .nav-link i {
             font-size: 1.1rem;
@@ -126,13 +127,13 @@
     </style>
 </head>
 <body>
-    <!-- SIDEBAR QUẢN TRỊ ADMIN -->
+    <!-- SIDEBAR QUẢN TRỊ KHÁCH SẠN -->
     <div id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <i class="bi bi-buildings-fill text-info fs-4"></i>
+            <i class="bi bi-buildings-fill text-white fs-4"></i>
             <div>
-                <span class="d-block leading-tight">Hotel Admin</span>
-                <small class="text-white-50 fw-normal" style="font-size: 0.72rem;">Cassandra NoSQL System</small>
+                <span class="d-block leading-tight fw-bold text-white">Grand Hotel PMS</span>
+                <small class="text-white-50 fw-normal" style="font-size: 0.72rem;">Hệ Thống Quản Lý Khách Sạn</small>
             </div>
         </div>
 
@@ -149,51 +150,51 @@
         <ul class="sidebar-nav">
             <li>
                 <a asp-controller="Hotels" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Hotels" ? "active" : "")">
-                    <i class="bi bi-building"></i> Khách Sạn
+                    <i class="bi bi-building"></i> Khách Sạn & Chi Nhánh
                 </a>
             </li>
             <li>
                 <a asp-controller="Rooms" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Rooms" ? "active" : "")">
-                    <i class="bi bi-door-open"></i> Phòng Nghỉ (M3)
+                    <i class="bi bi-door-open"></i> Sơ Đồ Phòng Nghỉ
                 </a>
             </li>
         </ul>
 
-        <div class="sidebar-heading">Nghiệp Vụ Lưu Trú</div>
+        <div class="sidebar-heading">Lễ Tân & Đặt Phòng</div>
         <ul class="sidebar-nav">
             <li>
                 <a asp-controller="Guests" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Guests" ? "active" : "")">
-                    <i class="bi bi-people"></i> Khách Hàng (M4)
+                    <i class="bi bi-people"></i> Hồ Sơ Khách Hàng
                 </a>
             </li>
             <li>
                 <a asp-controller="Bookings" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Bookings" ? "active" : "")">
-                    <i class="bi bi-calendar-check"></i> Đặt Phòng (M5)
+                    <i class="bi bi-calendar-check"></i> Đơn Đặt Phòng
                 </a>
             </li>
             <li>
-                <a asp-controller="BookingQueries" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "BookingQueries" ? "active" : "")">
-                    <i class="bi bi-search"></i> Tra Cứu Lịch Sử (M6)
+                <a asp-controller="BookingHistory" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "BookingHistory" ? "active" : "")">
+                    <i class="bi bi-clock-history"></i> Lịch Sử Lưu Trú
                 </a>
             </li>
         </ul>
 
-        <div class="sidebar-heading">Kế Toán & Thu Chi</div>
+        <div class="sidebar-heading">Thu Ngân & Hóa Đơn</div>
         <ul class="sidebar-nav">
             <li>
-                <a asp-controller="Invoices" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Invoices" ? "active" : "")">
-                    <i class="bi bi-receipt-cutoff"></i> Hóa Đơn (M7)
+                <a asp-controller="Invoice" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Invoice" ? "active" : "")">
+                    <i class="bi bi-receipt-cutoff"></i> Hóa Đơn & Thanh Toán
                 </a>
             </li>
         </ul>
 
-        <!-- Trạng thái CSDL Astra DB ở chân sidebar -->
+        <!-- Thông tin phiên bản ở chân sidebar -->
         <div class="p-3 mt-4 border-top border-secondary border-opacity-25 text-white-50 small">
             <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-success rounded-circle p-1" style="width: 8px; height: 8px;"></span>
-                <span class="text-light fw-semibold">Astra DB Connected</span>
+                <span class="badge bg-light text-dark rounded-circle p-1" style="width: 7px; height: 7px;"></span>
+                <span class="text-light fw-medium">Hệ thống Quản trị</span>
             </div>
-            <div class="font-monospace text-secondary" style="font-size: 0.75rem;">Keyspace: hotel_ks</div>
+            <div class="text-secondary" style="font-size: 0.75rem;">Phiên bản 2.6 Enterprise</div>
         </div>
     </div>
 
@@ -202,24 +203,24 @@
         <!-- TOPBAR QUẢN TRỊ -->
         <header class="admin-topbar">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-outline-secondary btn-sm d-lg-none" id="sidebar-toggle">
+                <button class="btn btn-outline-dark btn-sm d-lg-none" id="sidebar-toggle">
                     <i class="bi bi-list fs-5"></i>
                 </button>
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 font-monospace">
-                        ADMIN PORTAL
+                    <span class="badge bg-dark text-white border-0 px-2 py-1 fw-medium" style="letter-spacing: 0.03em;">
+                        HỆ THỐNG QUẢN TRỊ
                     </span>
-                    <span class="text-secondary small d-none d-md-inline">| Quản lý CSDL NoSQL</span>
+                    <span class="text-secondary small d-none d-md-inline">| Cổng Dịch Vụ Khách Sạn & Nghỉ Dưỡng</span>
                 </div>
             </div>
 
             <div class="d-flex align-items-center gap-3">
                 <div class="text-end d-none d-sm-block">
-                    <div class="fw-semibold text-dark small">Quản Trị Viên (TV1)</div>
-                    <small class="text-muted" style="font-size: 0.75rem;">Quyền hạn: Quản trị viên hệ thống</small>
+                    <div class="fw-semibold text-dark small">Ban Quản Lý Khách Sạn</div>
+                    <small class="text-muted" style="font-size: 0.75rem;">Bộ phận Lễ tân & Điều hành</small>
                 </div>
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-xs" style="width: 38px; height: 38px;">
-                    KL
+                <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold shadow-xs border border-secondary" style="width: 38px; height: 38px;">
+                    GM
                 </div>
             </div>
         </header>
@@ -228,8 +229,8 @@
         <main role="main" class="p-4 flex-grow-1">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show admin-card border-success" role="alert">
-                    <i class="bi bi-check-circle-fill text-success me-2"></i> @TempData["SuccessMessage"]
+                <div class="alert alert-dark alert-dismissible fade show admin-card border-dark" role="alert">
+                    <i class="bi bi-check-circle-fill text-dark me-2"></i> @TempData["SuccessMessage"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
@@ -247,16 +248,17 @@
         <!-- FOOTER QUẢN TRỊ -->
         <footer class="admin-footer d-flex justify-content-between align-items-center">
             <div>
-                &copy; 2026 <strong>HotelManagement System</strong> — Bài tập nhóm NoSQL Tuần 05.
+                &copy; 2026 <strong>Grand Hotel Management System (PMS)</strong>. Bảo lưu mọi quyền.
             </div>
-            <div class="font-monospace small text-muted">
-                Engine: DataStax Astra DB / Apache Cassandra
+            <div class="small text-muted">
+                <i class="bi bi-patch-check-fill text-dark me-1"></i>Tiêu Chuẩn Quản Lý Khách Sạn Quốc Tế
             </div>
         </footer>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
         document.getElementById("sidebar-toggle")?.addEventListener("click", function () {
             document.getElementById("sidebar-wrapper").classList.toggle("toggled");

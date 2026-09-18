@@ -1,60 +1,124 @@
 @model IEnumerable<HotelManagement.Models.BookingHistory>
 
 @{
-    ViewData["Title"] = "Tra cứu Lịch sử đặt phòng";
+    ViewData["Title"] = "Tra Cứu Lịch Sử Lưu Trú";
+    var customerId = Context.Request.Query["customerId"].ToString();
 }
 
-<h2>Tra cứu Lịch sử đặt phòng</h2>
-
-<!-- Form nhập liệu để gửi mã khách hàng về Controller -->
-<form method="get" action="/BookingHistory/Index" class="mb-4">
-    <div class="form-group">
-        <label for="customerId">Nhập Mã Khách Hàng (Customer ID):</label>
-        <div class="input-group mt-2" style="max-width: 400px;">
-            <input type="text" id="customerId" name="customerId" class="form-control" placeholder="Ví dụ: CUST001" required />
-            <button type="submit" class="btn btn-primary">Tra cứu</button>
+<div class="container-fluid px-0">
+    <div class="d-md-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 text-muted small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item text-secondary">Lễ tân & lưu trú</li>
+                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Lịch sử lưu trú</li>
+                </ol>
+            </nav>
+            <h2 class="h3 fw-bold text-dark mb-0">Tra Cứu Lịch Sử Lưu Trú Của Khách Hàng</h2>
         </div>
     </div>
-</form>
 
-<hr />
-
-<!-- Vòng lặp hiển thị kết quả nếu có dữ liệu -->
-@if (Model != null && Model.Any())
-{
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Mã Booking</th>
-                <th>Tên Khách Sạn</th>
-                <th>Ngày Check-in</th>
-                <th>Ngày Check-out</th>
-                <th>Tổng Tiền</th>
-                <th>Trạng Thái</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.BookingId</td>
-                    <td>@item.HotelName</td>
-                    <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
-                    <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>
-                    <td>@item.TotalAmount.ToString("N0") VNĐ</td>
-                    <td>
-                        <span class="badge @(item.Status == "Completed" ? "bg-success" : "bg-warning")">
-                            @item.Status
-                        </span>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-info mt-3">
-        Vui lòng nhập mã khách hàng để tra cứu hoặc khách hàng này chưa có lịch sử đặt phòng.
+    <!-- Khung tra cứu lịch sử -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+        <div class="card-body p-4">
+            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-search text-primary me-2"></i>Tìm Kiếm Hồ Sơ Lưu Trú</h6>
+            <form method="get" action="/BookingHistory/Index" class="row g-2 align-items-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-secondary-subtle"><i class="bi bi-person"></i></span>
+                        <input type="text" id="customerId" name="customerId" value="@customerId" class="form-control border-secondary-subtle" placeholder="Nhập Mã Khách Hàng (Ví dụ: GUEST001, GUEST002...)" required />
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary fw-semibold px-4">
+                        <i class="bi bi-search me-1"></i> Tra Cứu Lịch Sử
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-}
+
+    <!-- Hiển thị kết quả -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+            <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                <div class="fw-bold text-dark">
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Lịch Sử Đặt Phòng Của Khách: 
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1 ms-1">@customerId</span>
+                </div>
+                <span class="badge bg-light text-secondary border">@Model.Count() lượt lưu trú</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary small text-uppercase fw-semibold">
+                        <tr>
+                            <th>Mã Booking</th>
+                            <th>Chi Nhánh Khách Sạn</th>
+                            <th>Ngày Check-in</th>
+                            <th>Ngày Check-out</th>
+                            <th>Tổng Tiền</th>
+                            <th>Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="font-monospace small fw-bold">@item.BookingId</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@item.HotelName</div>
+                                    <small class="text-muted font-monospace">@item.HotelId</small>
+                                </td>
+                                <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
+                                <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>
+                                <td class="fw-bold text-dark">@item.TotalAmount.ToString("N0") VNĐ</td>
+                                <td>
+                                    @if (item.Status == "CONFIRMED" || item.Status == "COMPLETED" || item.Status == "OCCUPIED")
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="bi bi-check-circle me-1"></i>@item.Status
+                                        </span>
+                                    }
+                                    else if (item.Status == "CANCELLED")
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary px-2 py-1">
+                                            Đã hủy
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning-emphasis px-2 py-1">
+                                            @item.Status
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(customerId))
+    {
+        <div class="card border-0 shadow-sm rounded-3 p-5 text-center bg-white">
+            <div class="text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-3 text-secondary"></i>
+                <h5 class="fw-bold text-dark">Không tìm thấy lịch sử lưu trú</h5>
+                <p class="small text-secondary mb-0">Khách hàng <strong>@customerId</strong> chưa có lượt đặt phòng nào trong hệ thống.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-3 p-5 text-center bg-white">
+            <div class="text-muted">
+                <i class="bi bi-person-lines-fill fs-1 d-block mb-3 text-primary"></i>
+                <h5 class="fw-bold text-dark">Tra cứu lịch sử đặt phòng của khách hàng</h5>
+                <p class="small text-secondary mb-0">Nhập mã định danh khách hàng (Ví dụ: GUEST001, GUEST002...) để xem lịch sử lưu trú.</p>
+            </div>
+        </div>
+    }
+</div>

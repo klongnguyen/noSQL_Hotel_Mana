@@ -1,33 +1,62 @@
 @model HotelManagement.Models.Guest
-@{ ViewData["Title"] = "Thêm khách hàng"; }
-<div class="container" style="max-width:700px">
-    <h2 class="mb-4">Thêm khách hàng</h2>
-    <form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+@{ 
+    ViewData["Title"] = "Thêm Khách Hàng"; 
+}
 
-    <div class="mb-3">
-        <label asp-for="GuestId" class="form-label fw-semibold">Mã khách hàng</label>
-        <input asp-for="GuestId" class="form-control" />
-        <span asp-validation-for="GuestId" class="text-danger"></span>
+<div class="container" style="max-width:750px">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 text-muted small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Guests" asp-action="Index" class="text-decoration-none">Khách hàng</a></li>
+                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Thêm mới</li>
+                </ol>
+            </nav>
+            <h2 class="h3 fw-bold text-dark mb-0">Đăng Ký Khách Hàng Mới</h2>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
     </div>
-    <div class="mb-3">
-        <label asp-for="FullName" class="form-label fw-semibold">Họ và tên</label>
-        <input asp-for="FullName" class="form-control" required />
-        <span asp-validation-for="FullName" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Phone" class="form-label fw-semibold">Số điện thoại</label>
-        <input asp-for="Phone" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label fw-semibold">Email</label>
-        <input asp-for="Email" type="email" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="NationalId" class="form-label fw-semibold">CCCD/CMND</label>
-        <input asp-for="NationalId" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Lưu</button>
-    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-</form>
+
+    <form asp-action="Create" method="post" class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-person-plus text-primary me-2"></i>Thông Tin Định Danh Khách Hàng</h6>
+        </div>
+        <div class="card-body p-4">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="GuestId" class="form-label fw-semibold">Mã Khách Hàng</label>
+                    <input asp-for="GuestId" class="form-control" placeholder="Ví dụ: GUEST036" required />
+                    <span asp-validation-for="GuestId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="FullName" class="form-label fw-semibold">Họ Và Tên</label>
+                    <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" required />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Phone" class="form-label fw-semibold">Số Điện Thoại</label>
+                    <input asp-for="Phone" class="form-control" placeholder="0901234567" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label fw-semibold">Địa Chỉ Email</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="example@gmail.com" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="NationalId" class="form-label fw-semibold">Số CCCD / CMND / Hộ Chiếu</label>
+                    <input asp-for="NationalId" class="form-control" placeholder="079200000001" />
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white p-3 px-4 border-top d-flex gap-2 justify-content-end">
+            <a asp-action="Index" class="btn btn-light border px-4">Hủy</a>
+            <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="bi bi-save me-1"></i> Lưu Thông Tin
+            </button>
+        </div>
+    </form>
 </div>

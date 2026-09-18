@@ -124,41 +124,41 @@ INSERT INTO rooms_by_hotel_status (hotel_id, status, room_number, room_type, pri
 -- =====================================================
 -- 4) GUESTS: 35 rows
 -- =====================================================
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST001', 'Guest Demo 01', '0910000001', 'guest001@gmail.com', '079200000001');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST002', 'Guest Demo 02', '0910000002', 'guest002@gmail.com', '079200000002');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST003', 'Guest Demo 03', '0910000003', 'guest003@gmail.com', '079200000003');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST004', 'Guest Demo 04', '0910000004', 'guest004@gmail.com', '079200000004');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST005', 'Guest Demo 05', '0910000005', 'guest005@gmail.com', '079200000005');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST006', 'Guest Demo 06', '0910000006', 'guest006@gmail.com', '079200000006');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST007', 'Guest Demo 07', '0910000007', 'guest007@gmail.com', '079200000007');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST008', 'Guest Demo 08', '0910000008', 'guest008@gmail.com', '079200000008');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST009', 'Guest Demo 09', '0910000009', 'guest009@gmail.com', '079200000009');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST010', 'Guest Demo 10', '0910000010', 'guest010@gmail.com', '079200000010');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST011', 'Guest Demo 11', '0910000011', 'guest011@gmail.com', '079200000011');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST012', 'Guest Demo 12', '0910000012', 'guest012@gmail.com', '079200000012');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST013', 'Guest Demo 13', '0910000013', 'guest013@gmail.com', '079200000013');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST014', 'Guest Demo 14', '0910000014', 'guest014@gmail.com', '079200000014');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST015', 'Guest Demo 15', '0910000015', 'guest015@gmail.com', '079200000015');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST016', 'Guest Demo 16', '0910000016', 'guest016@gmail.com', '079200000016');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST017', 'Guest Demo 17', '0910000017', 'guest017@gmail.com', '079200000017');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST018', 'Guest Demo 18', '0910000018', 'guest018@gmail.com', '079200000018');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST019', 'Guest Demo 19', '0910000019', 'guest019@gmail.com', '079200000019');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST020', 'Guest Demo 20', '0910000020', 'guest020@gmail.com', '079200000020');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST021', 'Guest Demo 21', '0910000021', 'guest021@gmail.com', '079200000021');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST022', 'Guest Demo 22', '0910000022', 'guest022@gmail.com', '079200000022');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST023', 'Guest Demo 23', '0910000023', 'guest023@gmail.com', '079200000023');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST024', 'Guest Demo 24', '0910000024', 'guest024@gmail.com', '079200000024');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST025', 'Guest Demo 25', '0910000025', 'guest025@gmail.com', '079200000025');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST026', 'Guest Demo 26', '0910000026', 'guest026@gmail.com', '079200000026');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST027', 'Guest Demo 27', '0910000027', 'guest027@gmail.com', '079200000027');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST028', 'Guest Demo 28', '0910000028', 'guest028@gmail.com', '079200000028');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST029', 'Guest Demo 29', '0910000029', 'guest029@gmail.com', '079200000029');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST030', 'Guest Demo 30', '0910000030', 'guest030@gmail.com', '079200000030');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST031', 'Guest Demo 31', '0910000031', 'guest031@gmail.com', '079200000031');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST032', 'Guest Demo 32', '0910000032', 'guest032@gmail.com', '079200000032');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST033', 'Guest Demo 33', '0910000033', 'guest033@gmail.com', '079200000033');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST034', 'Guest Demo 34', '0910000034', 'guest034@gmail.com', '079200000034');
-INSERT INTO guests (guest_id, full_name, phone, email, national_id) VALUES ('GUEST035', 'Guest Demo 35', '0910000035', 'guest035@gmail.com', '079200000035');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST001', 'Guest Demo 01', '0910000001', 'guest001@gmail.com', '079200000001');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST002', 'Guest Demo 02', '0910000002', 'guest002@gmail.com', '079200000002');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST003', 'Guest Demo 03', '0910000003', 'guest003@gmail.com', '079200000003');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST004', 'Guest Demo 04', '0910000004', 'guest004@gmail.com', '079200000004');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST005', 'Guest Demo 05', '0910000005', 'guest005@gmail.com', '079200000005');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST006', 'Guest Demo 06', '0910000006', 'guest006@gmail.com', '079200000006');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST007', 'Guest Demo 07', '0910000007', 'guest007@gmail.com', '079200000007');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST008', 'Guest Demo 08', '0910000008', 'guest008@gmail.com', '079200000008');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST009', 'Guest Demo 09', '0910000009', 'guest009@gmail.com', '079200000009');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST010', 'Guest Demo 10', '0910000010', 'guest010@gmail.com', '079200000010');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST011', 'Guest Demo 11', '0910000011', 'guest011@gmail.com', '079200000011');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST012', 'Guest Demo 12', '0910000012', 'guest012@gmail.com', '079200000012');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST013', 'Guest Demo 13', '0910000013', 'guest013@gmail.com', '079200000013');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST014', 'Guest Demo 14', '0910000014', 'guest014@gmail.com', '079200000014');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST015', 'Guest Demo 15', '0910000015', 'guest015@gmail.com', '079200000015');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST016', 'Guest Demo 16', '0910000016', 'guest016@gmail.com', '079200000016');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST017', 'Guest Demo 17', '0910000017', 'guest017@gmail.com', '079200000017');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST018', 'Guest Demo 18', '0910000018', 'guest018@gmail.com', '079200000018');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST019', 'Guest Demo 19', '0910000019', 'guest019@gmail.com', '079200000019');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST020', 'Guest Demo 20', '0910000020', 'guest020@gmail.com', '079200000020');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST021', 'Guest Demo 21', '0910000021', 'guest021@gmail.com', '079200000021');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST022', 'Guest Demo 22', '0910000022', 'guest022@gmail.com', '079200000022');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST023', 'Guest Demo 23', '0910000023', 'guest023@gmail.com', '079200000023');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST024', 'Guest Demo 24', '0910000024', 'guest024@gmail.com', '079200000024');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST025', 'Guest Demo 25', '0910000025', 'guest025@gmail.com', '079200000025');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST026', 'Guest Demo 26', '0910000026', 'guest026@gmail.com', '079200000026');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST027', 'Guest Demo 27', '0910000027', 'guest027@gmail.com', '079200000027');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST028', 'Guest Demo 28', '0910000028', 'guest028@gmail.com', '079200000028');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST029', 'Guest Demo 29', '0910000029', 'guest029@gmail.com', '079200000029');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST030', 'Guest Demo 30', '0910000030', 'guest030@gmail.com', '079200000030');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST031', 'Guest Demo 31', '0910000031', 'guest031@gmail.com', '079200000031');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST032', 'Guest Demo 32', '0910000032', 'guest032@gmail.com', '079200000032');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST033', 'Guest Demo 33', '0910000033', 'guest033@gmail.com', '079200000033');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST034', 'Guest Demo 34', '0910000034', 'guest034@gmail.com', '079200000034');
+INSERT INTO guests (guest_id, full_name, phone, email, citizen_id) VALUES ('GUEST035', 'Guest Demo 35', '0910000035', 'guest035@gmail.com', '079200000035');
 
 -- =====================================================
 -- 5) BOOKINGS_BY_GUEST: 35 rows

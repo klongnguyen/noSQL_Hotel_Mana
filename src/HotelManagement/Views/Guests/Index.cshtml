@@ -1,60 +1,99 @@
 @model IEnumerable<HotelManagement.Models.Guest>
 @{
-    ViewData["Title"] = "Quản lý khách hàng";
+    ViewData["Title"] = "Hồ Sơ Khách Hàng";
 }
 
 <div class="container-fluid px-0">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-md-flex justify-content-between align-items-center mb-4">
         <div>
-            <div class="text-muted small mb-1">Nghiệp vụ lưu trú</div>
-            <h2 class="h3 fw-bold mb-0">Quản lý Khách hàng</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 text-muted small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item text-secondary">Lễ tân & lưu trú</li>
+                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Khách hàng</li>
+                </ol>
+            </nav>
+            <h2 class="h3 fw-bold text-dark mb-0">Hồ Sơ & Danh Bạ Khách Hàng</h2>
         </div>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-person-plus me-1"></i> Thêm khách hàng
-        </a>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a asp-action="Create" class="btn btn-primary fw-semibold shadow-xs">
+                <i class="bi bi-person-plus me-1"></i> Thêm Khách Hàng Mới
+            </a>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between">
-            <strong><i class="bi bi-people me-2 text-primary"></i>Danh sách khách hàng</strong>
-            <span class="badge bg-primary-subtle text-primary">@Model.Count() khách hàng</span>
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <div class="fw-bold text-dark">
+                <i class="bi bi-people me-2 text-primary"></i>Danh Sách Khách Hàng
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2">@Model.Count() khách hàng</span>
+            </div>
+            <span class="text-muted small">Dữ liệu thành viên lưu trú</span>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="table-light text-secondary small text-uppercase fw-semibold">
                     <tr>
-                        <th>Mã KH</th>
-                        <th>Họ tên</th>
-                        <th>Số điện thoại</th>
-                        <th>Email</th>
-                        <th>CCCD/CMND</th>
-                        <th class="text-end">Thao tác</th>
+                        <th style="width: 140px;">Mã KH</th>
+                        <th>Họ Và Tên</th>
+                        <th>Số Điện Thoại</th>
+                        <th>Địa Chỉ Email</th>
+                        <th>CCCD / CMND</th>
+                        <th class="text-end pe-4">Thao Tác</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="border-top-0">
                 @foreach (var guest in Model)
                 {
                     <tr>
-                        <td><span class="badge bg-secondary-subtle text-secondary font-monospace">@guest.GuestId</span></td>
-                        <td class="fw-semibold">@guest.FullName</td>
-                        <td>@guest.Phone</td>
-                        <td>@guest.Email</td>
-                        <td>@guest.NationalId</td>
-                        <td class="text-end">
+                        <td>
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis font-monospace px-2 py-1">
+                                @guest.GuestId
+                            </span>
+                        </td>
+                        <td class="fw-bold text-dark">@guest.FullName</td>
+                        <td class="font-monospace small">
+                            <a href="tel:@guest.Phone" class="text-decoration-none text-secondary">
+                                <i class="bi bi-telephone text-primary me-1"></i>@guest.Phone
+                            </a>
+                        </td>
+                        <td class="small">
+                            <a href="mailto:@guest.Email" class="text-decoration-none text-secondary">
+                                <i class="bi bi-envelope text-primary me-1"></i>@guest.Email
+                            </a>
+                        </td>
+                        <td class="font-monospace small">@guest.NationalId</td>
+                        <td class="text-end pe-4">
                             <div class="btn-group btn-group-sm">
-                                <a asp-action="Details" asp-route-id="@guest.GuestId" class="btn btn-outline-primary">Chi tiết</a>
-                                <a asp-action="Edit" asp-route-id="@guest.GuestId" class="btn btn-outline-warning">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@guest.GuestId" class="btn btn-outline-danger">Xóa</a>
+                                <a asp-action="Details" asp-route-id="@guest.GuestId" class="btn btn-outline-primary" title="Xem chi tiết">
+                                    <i class="bi bi-eye"></i> Chi tiết
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@guest.GuestId" class="btn btn-outline-warning" title="Chỉnh sửa">
+                                    <i class="bi bi-pencil"></i> Sửa
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@guest.GuestId" class="btn btn-outline-danger" title="Xóa">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </a>
                             </div>
                         </td>
                     </tr>
                 }
                 @if (!Model.Any())
                 {
-                    <tr><td colspan="6" class="text-center py-5 text-muted">Chưa có dữ liệu khách hàng.</td></tr>
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-person-x fs-1 d-block mb-2 text-secondary"></i>
+                            Chưa có dữ liệu khách hàng trong hệ thống.
+                        </td>
+                    </tr>
                 }
                 </tbody>
             </table>
+        </div>
+
+        <div class="card-footer bg-white py-3 px-4 border-top text-muted small d-flex justify-content-between align-items-center">
+            <span>Tổng cộng <strong>@Model.Count()</strong> hồ sơ khách hàng.</span>
+            <span>Grand Hotel PMS</span>
         </div>
     </div>
 </div>

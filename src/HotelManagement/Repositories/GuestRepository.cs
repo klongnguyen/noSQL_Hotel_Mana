@@ -19,7 +19,7 @@ public class GuestRepository : IGuestRepository
     public async Task<IEnumerable<Guest>> GetAllAsync()
     {
         const string cql = """
-            SELECT guest_id, full_name, phone, email, national_id
+            SELECT guest_id, full_name, phone, email, citizen_id
             FROM guests;
             """;
 
@@ -30,7 +30,7 @@ public class GuestRepository : IGuestRepository
     public async Task<Guest?> GetByIdAsync(string guestId)
     {
         const string cql = """
-            SELECT guest_id, full_name, phone, email, national_id
+            SELECT guest_id, full_name, phone, email, citizen_id
             FROM guests
             WHERE guest_id = ?;
             """;
@@ -44,7 +44,7 @@ public class GuestRepository : IGuestRepository
     public async Task CreateAsync(Guest guest)
     {
         const string cql = """
-            INSERT INTO guests (guest_id, full_name, phone, email, national_id)
+            INSERT INTO guests (guest_id, full_name, phone, email, citizen_id)
             VALUES (?, ?, ?, ?, ?);
             """;
 
@@ -61,7 +61,7 @@ public class GuestRepository : IGuestRepository
     {
         const string cql = """
             UPDATE guests
-            SET full_name = ?, phone = ?, email = ?, national_id = ?
+            SET full_name = ?, phone = ?, email = ?, citizen_id = ?
             WHERE guest_id = ?;
             """;
 
@@ -84,11 +84,11 @@ public class GuestRepository : IGuestRepository
     {
         return new Guest
         {
-            GuestId = row.GetValue<string>("guest_id"),
-            FullName = row.GetValue<string>("full_name"),
-            Phone = row.GetValue<string>("phone"),
-            Email = row.GetValue<string>("email"),
-            NationalId = row.GetValue<string>("national_id")
+            GuestId = row.GetValue<string>("guest_id") ?? string.Empty,
+            FullName = row.GetValue<string>("full_name") ?? string.Empty,
+            Phone = row.GetValue<string>("phone") ?? string.Empty,
+            Email = row.GetValue<string>("email") ?? string.Empty,
+            NationalId = row.GetValue<string>("citizen_id") ?? string.Empty
         };
     }
 }

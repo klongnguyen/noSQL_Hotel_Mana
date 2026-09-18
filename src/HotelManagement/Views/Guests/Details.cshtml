@@ -1,20 +1,74 @@
 @model HotelManagement.Models.Guest
-@{ ViewData["Title"] = "Chi tiết khách hàng"; }
-<div class="container" style="max-width:800px">
-    <h2 class="mb-4">Chi tiết khách hàng</h2>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <dl class="row mb-0">
-                <dt class="col-sm-4">Mã khách hàng</dt><dd class="col-sm-8">@Model.GuestId</dd>
-                <dt class="col-sm-4">Họ tên</dt><dd class="col-sm-8">@Model.FullName</dd>
-                <dt class="col-sm-4">Số điện thoại</dt><dd class="col-sm-8">@Model.Phone</dd>
-                <dt class="col-sm-4">Email</dt><dd class="col-sm-8">@Model.Email</dd>
-                <dt class="col-sm-4">CCCD/CMND</dt><dd class="col-sm-8">@Model.NationalId</dd>
-            </dl>
+@{ 
+    ViewData["Title"] = "Chi Tiết Khách Hàng"; 
+}
+
+<div class="container" style="max-width:750px">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 text-muted small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Guests" asp-action="Index" class="text-decoration-none">Khách hàng</a></li>
+                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Hồ sơ</li>
+                </ol>
+            </nav>
+            <h2 class="h3 fw-bold text-dark mb-0">Hồ Sơ Chi Tiết Khách Hàng</h2>
         </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
     </div>
-    <div class="mt-3">
-        <a asp-action="Edit" asp-route-id="@Model.GuestId" class="btn btn-warning">Sửa</a>
-        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-person-badge text-primary me-2"></i>Thông Tin Thành Viên</h6>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis font-monospace px-2 py-1">@Model.GuestId</span>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <label class="text-muted small d-block">Mã khách hàng:</label>
+                    <span class="font-monospace fw-bold text-dark fs-6">@Model.GuestId</span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="text-muted small d-block">Họ và tên:</label>
+                    <span class="fw-bold text-dark fs-6">@Model.FullName</span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="text-muted small d-block">Số điện thoại:</label>
+                    <span class="text-dark">
+                        <a href="tel:@Model.Phone" class="text-decoration-none text-dark fw-semibold">
+                            <i class="bi bi-telephone text-primary me-1"></i>@Model.Phone
+                        </a>
+                    </span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="text-muted small d-block">Địa chỉ email:</label>
+                    <span class="text-dark">
+                        <a href="mailto:@Model.Email" class="text-decoration-none text-dark">
+                            <i class="bi bi-envelope text-primary me-1"></i>@Model.Email
+                        </a>
+                    </span>
+                </div>
+                <div class="col-12">
+                    <label class="text-muted small d-block">Số CCCD / CMND / Hộ Chiếu:</label>
+                    <span class="font-monospace fw-semibold text-dark">@Model.NationalId</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white p-3 px-4 border-top d-flex justify-content-between align-items-center">
+            <a asp-controller="BookingHistory" asp-action="Index" asp-route-customerId="@Model.GuestId" class="btn btn-outline-info btn-sm fw-semibold">
+                <i class="bi bi-clock-history me-1"></i> Lịch Sử Đặt Phòng
+            </a>
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.GuestId" class="btn btn-warning btn-sm px-3 fw-semibold">
+                    <i class="bi bi-pencil me-1"></i> Chỉnh Sửa
+                </a>
+                <a asp-action="Delete" asp-route-id="@Model.GuestId" class="btn btn-outline-danger btn-sm px-3">
+                    <i class="bi bi-trash me-1"></i> Xóa
+                </a>
+            </div>
+        </div>
     </div>
 </div>

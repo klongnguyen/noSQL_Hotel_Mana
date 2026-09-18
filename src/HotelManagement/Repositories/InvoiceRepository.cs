@@ -8,7 +8,6 @@ namespace HotelManagement.Repositories
     {
         private readonly Cassandra.ISession _session;
 
-        // Tiêm ICassandraContext 
         public InvoiceRepository(ICassandraContext context)
         {
             _session = context.Session;
@@ -16,32 +15,30 @@ namespace HotelManagement.Repositories
 
         public async Task<Invoice?> GetInvoiceByBookingIdAsync(Guid bookingId)
         {
-            // Truy vấn hóa đơn từ bảng invoice_by_booking theo đúng yêu cầu Jira KAN-17
-            string cql = "SELECT * FROM invoice_by_booking WHERE booking_id = ?";
+            const string cql = "SELECT booking_id, invoice_id, guest_id, hotel_id, issued_at, payment_status, room_charge, service_charge, tax, total_amount FROM invoices_by_booking WHERE booking_id = ?;";
             var statement = new SimpleStatement(cql, bookingId);
             
             RowSet rowSet = await _session.ExecuteAsync(statement);
-            
-            // Lấy dòng dữ liệu đầu tiên tìm được (nếu có)
             Row? row = rowSet.FirstOrDefault();
 
             if (row == null)
             {
-                return null; // Không tìm thấy hóa đơn
+                return null;
             }
 
-            // Ánh xạ dữ liệu từ CSDL vào Model Invoice
+            var issuedAt = row.GetValue<DateTimeOffset>("issued_at");
+
             return new Invoice
             {
                 BookingId = row.GetValue<Guid>("booking_id"),
-                InvoiceId = row.GetValue<string>("invoice_id"),
-                CustomerName = row.GetValue<string>("customer_name"),
+                InvoiceId = row.GetValue<Guid>("invoice_id").ToString(),
+                CustomerName = row.GetValue<string>("guest_id"),
                 RoomCharge = row.GetValue<decimal>("room_charge"),
                 Tax = row.GetValue<decimal>("tax"),
-                AdditionalFees = row.GetValue<decimal>("additional_fees"),
+                AdditionalFees = row.GetValue<decimal>("service_charge"),
                 TotalAmount = row.GetValue<decimal>("total_amount"),
-                IssueDate = row.GetValue<DateTime>("issue_date"),
-                Status = row.GetValue<string>("status")
+                IssueDate = issuedAt.LocalDateTime,
+                Status = row.GetValue<string>("payment_status")
             };
         }
     }

@@ -1,26 +1,39 @@
 @model HotelManagement.Models.Invoice
 
 @{
-    ViewData["Title"] = "Quản lý và Xuất Hóa đơn";
+    ViewData["Title"] = "Hóa Đơn & Thanh Toán";
+    var bookingIdParam = Context.Request.Query["bookingId"].ToString();
 }
 
-<div class="container mt-4">
-    <h2 class="text-primary mb-4"><i class="bi bi-receipt"></i> Tra cứu Hóa đơn</h2>
+<div class="container-fluid px-0">
+    <div class="d-md-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 text-muted small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item text-secondary">Thu ngân & kế toán</li>
+                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Hóa đơn</li>
+                </ol>
+            </nav>
+            <h2 class="h3 fw-bold text-dark mb-0">Quản Lý & Tra Cứu Hóa Đơn</h2>
+        </div>
+    </div>
 
     <!-- Khung tìm kiếm hóa đơn -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" action="/Invoice/Index">
-                <div class="row g-3 align-items-center">
-                    <div class="col-auto">
-                        <label for="bookingId" class="col-form-label fw-bold">Mã Đặt Phòng (Booking ID):</label>
+    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+        <div class="card-body p-4">
+            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-search text-primary me-2"></i>Tra Cứu Hóa Đơn Theo Mã Đặt Phòng</h6>
+            <form method="get" action="/Invoice/Index" class="row g-2 align-items-center">
+                <div class="col-md-7 col-lg-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-secondary-subtle"><i class="bi bi-receipt"></i></span>
+                        <input type="text" id="bookingId" name="bookingId" value="@bookingIdParam" class="form-control border-secondary-subtle" placeholder="Nhập mã đặt phòng GUID (VD: d2bc7d0b-d87b-5a7b-bbf2-7db03af639bf)..." required />
                     </div>
-                    <div class="col-md-6">
-                        <input type="text" id="bookingId" name="bookingId" class="form-control" placeholder="Nhập mã GUID (VD: 123e4567-e89b-12d3...)" required />
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Tìm Hóa Đơn</button>
-                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary fw-semibold px-4">
+                        <i class="bi bi-search me-1"></i> Tìm Hóa Đơn
+                    </button>
                 </div>
             </form>
         </div>
@@ -29,76 +42,125 @@
     <!-- Hiển thị thông báo lỗi (nếu có) -->
     @if (ViewBag.ErrorMessage != null)
     {
-        <div class="alert alert-danger shadow-sm">
-            @ViewBag.ErrorMessage
+        <div class="alert alert-warning shadow-xs border-warning-subtle d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-exclamation-circle-fill text-warning fs-5"></i>
+            <span>@ViewBag.ErrorMessage</span>
         </div>
     }
 
-    <!-- Khung chi tiết hóa đơn -->
+    <!-- Khung chi tiết hóa đơn (Hotel Folio Invoice Receipt) -->
     @if (Model != null)
     {
-        <div class="card shadow border-0" id="invoiceArea">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Chi Tiết Hóa Đơn - @Model.InvoiceId</h4>
-                <span class="badge @(Model.Status == "Paid" ? "bg-success" : "bg-warning") fs-6">
-                    @Model.Status
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-sm-6">
-                        <h6 class="mb-3">Thông tin khách hàng:</h6>
-                        <div><strong>Khách hàng:</strong> @Model.CustomerName</div>
-                        <div><strong>Ngày lập:</strong> @Model.IssueDate.ToString("dd/MM/yyyy HH:mm")</div>
+        <div class="card border-0 shadow rounded-4 bg-white overflow-hidden mx-auto" style="max-width: 850px;" id="invoiceArea">
+            <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-buildings text-warning fs-1"></i>
+                    <div>
+                        <h4 class="mb-0 fw-bold text-white">PHIẾU HÓA ĐƠN KHÁCH SẠN</h4>
+                        <small class="text-white-50">Grand Hotel Management System &bull; Folio Receipt</small>
                     </div>
-                    <div class="col-sm-6 text-sm-end">
-                        <h6 class="mb-3">Thông tin mã đối chiếu:</h6>
-                        <div><strong>Mã Booking:</strong> @Model.BookingId</div>
-                        <div><strong>Mã Hóa đơn:</strong> @Model.InvoiceId</div>
+                </div>
+                <div>
+                    @if (Model.Status == "PAID" || Model.Status == "Paid")
+                    {
+                        <span class="badge bg-success fs-6 px-3 py-2 shadow-xs">
+                            <i class="bi bi-check-circle me-1"></i> ĐÃ THANH TOÁN
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-2 shadow-xs">
+                            <i class="bi bi-hourglass-split me-1"></i> CHƯA THANH TOÁN
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <div class="row mb-4 pb-3 border-bottom">
+                    <div class="col-sm-6">
+                        <small class="text-uppercase text-secondary fw-semibold">Thông Tin Khách Hàng</small>
+                        <div class="fs-5 fw-bold text-dark mt-1">Mã KH: @Model.CustomerName</div>
+                        <div class="text-muted small">Thời điểm xuất: @Model.IssueDate.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                    <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                        <small class="text-uppercase text-secondary fw-semibold">Số Hiệu Chứng Từ</small>
+                        <div class="font-monospace small mt-1 text-secondary">
+                            <strong>Mã Hóa Đơn:</strong> <span class="text-dark">@Model.InvoiceId</span>
+                        </div>
+                        <div class="font-monospace small text-secondary">
+                            <strong>Mã Booking:</strong> <span class="text-dark">@Model.BookingId</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="table-responsive-sm">
-                    <table class="table table-striped">
-                        <thead>
+                <div class="table-responsive mb-4">
+                    <table class="table align-middle">
+                        <thead class="table-light text-secondary text-uppercase small">
                             <tr>
-                                <th>Hạng Mục Phí</th>
-                                <th class="text-end">Thành Tiền (VNĐ)</th>
+                                <th>#</th>
+                                <th>Hạng Mục Dịch Vụ</th>
+                                <th class="text-end">Đơn Giá / Thành Tiền</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Tiền phòng (Room Charge)</td>
-                                <td class="text-end">@Model.RoomCharge.ToString("N0")</td>
+                                <td class="text-muted">1</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">Tiền Phòng Lưu Trú</div>
+                                    <small class="text-muted">Chi phí tiền phòng theo thời gian lưu trú</small>
+                                </td>
+                                <td class="text-end fw-bold text-dark">@Model.RoomCharge.ToString("N0") VNĐ</td>
                             </tr>
                             <tr>
-                                <td>Thuế (Tax)</td>
-                                <td class="text-end">@Model.Tax.ToString("N0")</td>
+                                <td class="text-muted">2</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">Phí Dịch Vụ Khách Sạn</div>
+                                    <small class="text-muted">Phí tiện ích, dịch vụ buồng phòng</small>
+                                </td>
+                                <td class="text-end fw-bold text-dark">@Model.AdditionalFees.ToString("N0") VNĐ</td>
                             </tr>
                             <tr>
-                                <td>Phụ phí (Additional Fees)</td>
-                                <td class="text-end">@Model.AdditionalFees.ToString("N0")</td>
+                                <td class="text-muted">3</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">Thuế Giá Trị Gia Tăng (VAT)</div>
+                                    <small class="text-muted">Thuế suất quy định</small>
+                                </td>
+                                <td class="text-end fw-bold text-dark">@Model.Tax.ToString("N0") VNĐ</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4 col-sm-5 ms-auto">
-                        <table class="table table-clear">
-                            <tbody>
-                                <tr>
-                                    <td class="left"><strong>Tổng Cộng:</strong></td>
-                                    <td class="right text-end text-danger fw-bold fs-5">@Model.TotalAmount.ToString("N0")</td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                <div class="row pt-3 border-top">
+                    <div class="col-sm-7 text-muted small">
+                        <p class="mb-1"><i class="bi bi-shield-check text-success me-1"></i>Hóa đơn điện tử hợp lệ được quản lý bởi Grand Hotel PMS.</p>
+                        <p class="mb-0">Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ lưu trú của chúng tôi!</p>
+                    </div>
+                    <div class="col-sm-5 text-sm-end">
+                        <div class="d-flex justify-content-between justify-content-sm-end gap-3 align-items-center">
+                            <span class="fs-6 fw-bold text-secondary">TỔNG CỘNG:</span>
+                            <span class="fs-4 fw-bold text-danger">@Model.TotalAmount.ToString("N0") VNĐ</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer bg-light text-end">
-                <button type="button" class="btn btn-success" onclick="alert('Tính năng in PDF đang được phát triển!')">
-                    <i class="bi bi-printer"></i> Xuất Hóa Đơn (PDF)
+
+            <div class="card-footer bg-light p-3 px-4 d-flex justify-content-between align-items-center">
+                <span class="text-muted small">Grand Hotel Management System</span>
+                <button type="button" class="btn btn-primary fw-semibold" onclick="window.print()">
+                    <i class="bi bi-printer me-1"></i> In Hóa Đơn
                 </button>
+            </div>
+        </div>
+    }
+    else if (string.IsNullOrEmpty(ViewBag.ErrorMessage as string))
+    {
+        <div class="card border-0 shadow-sm rounded-3 p-5 text-center bg-white">
+            <div class="text-muted">
+                <i class="bi bi-receipt-cutoff fs-1 d-block mb-3 text-primary"></i>
+                <h5 class="fw-bold text-dark">Tra cứu phiếu thanh toán & hóa đơn</h5>
+                <p class="small text-secondary mb-0">Nhập mã đặt phòng (Booking ID GUID) để xem chi tiết hóa đơn thanh toán.</p>
             </div>
         </div>
     }
