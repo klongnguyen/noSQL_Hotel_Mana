@@ -10,6 +10,7 @@ public class BookingsController : Controller
     private readonly IGuestRepository _guestRepository;
     private readonly IHotelRepository _hotelRepository;
     private readonly IRoomRepository _roomRepository;
+    private readonly HotelManagement.Services.IDashboardAnalyticsService _analyticsService;
     private readonly ILogger<BookingsController> _logger;
 
     public BookingsController(
@@ -17,12 +18,14 @@ public class BookingsController : Controller
         IGuestRepository guestRepository,
         IHotelRepository hotelRepository,
         IRoomRepository roomRepository,
+        HotelManagement.Services.IDashboardAnalyticsService analyticsService,
         ILogger<BookingsController> logger)
     {
         _bookingRepository = bookingRepository;
         _guestRepository = guestRepository;
         _hotelRepository = hotelRepository;
         _roomRepository = roomRepository;
+        _analyticsService = analyticsService;
         _logger = logger;
     }
 
@@ -112,6 +115,9 @@ public class BookingsController : Controller
             booking.Status = "CONFIRMED";
 
             await _bookingRepository.CreateAsync(booking);
+
+            // Tự động cập nhật thống kê động lên Dashboard (Doanh thu, Top chi nhánh, Bản đồ mật độ)
+            await _analyticsService.RecordBookingAsync(booking);
 
             TempData["SuccessMessage"] =
                 $"Đặt phòng thành công. Mã booking: {booking.BookingId}";

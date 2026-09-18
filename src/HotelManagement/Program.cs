@@ -18,6 +18,9 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IGuestRepository, GuestRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 
+// Đăng ký Service Thống Kê Dashboard Cập Nhật Động (Dynamic Real-time Analytics)
+builder.Services.AddScoped<HotelManagement.Services.IDashboardAnalyticsService, HotelManagement.Services.DashboardAnalyticsService>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
