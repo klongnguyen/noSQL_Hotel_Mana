@@ -137,7 +137,7 @@
         </div>
     </div>
 
-    <!-- 3. Hàng Biểu Đồ 1: Xu hướng Doanh Thu & Top Chi Nhánh Doanh Thu Cao Nhất -->
+    <!-- 3. Hàng Biểu Đồ: Xu hướng Doanh Thu & Top Chi Nhánh Doanh Thu Cao Nhất -->
     <div class="row g-4 mb-4">
         <!-- Biểu đồ Doanh Thu -->
         <div class="col-xl-7">
@@ -148,11 +148,11 @@
                         <p class="text-secondary small mb-0">Thống kê lũy kế theo chu kỳ tháng (Đơn vị: VNĐ)</p>
                     </div>
                     <div class="text-end">
-                        <span class="text-muted small d-block" style="font-size: 0.75rem;">Tổng Doanh Thu</span>
+                        <span class="text-muted small d-block" style="font-size: 0.75rem;">Tổng Doanh Thu Lũy Kế</span>
                         <span class="fw-bold text-dark fs-5">@Model.TotalAnnualRevenue.ToString("N0") đ</span>
                     </div>
                 </div>
-                <div style="height: 310px;">
+                <div style="height: 330px;">
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
@@ -164,186 +164,12 @@
                 <div class="d-flex justify-content-between align-items-start mb-3 pb-2 border-bottom border-light-subtle">
                     <div>
                         <h5 class="fw-bold text-dark mb-1" style="font-size: 1.05rem;">Top Chi Nhánh Doanh Thu Cao Nhất</h5>
-                        <p class="text-secondary small mb-0">Các khách sạn dẫn đầu về kết quả kinh doanh</p>
+                        <p class="text-secondary small mb-0">Các cơ sở dẫn đầu về kết quả kinh doanh</p>
                     </div>
                     <div class="badge bg-dark text-white fw-normal px-2 py-1">Top Xếp Hạng</div>
                 </div>
-                <div style="height: 310px;">
+                <div style="height: 330px;">
                     <canvas id="branchesChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. Hàng Biểu Đồ 2: Bản Đồ Mật Độ Khách Khu Vực & Bảng Chỉ Số Phân Bổ -->
-    <div class="row g-4 mb-4">
-        <!-- Bản Đồ Phân Bố Mật Độ Khách -->
-        <div class="col-xl-7">
-            <div class="mono-card p-4 h-100">
-                <div class="d-flex justify-content-between align-items-start mb-3 pb-2 border-bottom border-light-subtle">
-                    <div>
-                        <h5 class="fw-bold text-dark mb-1" style="font-size: 1.05rem;">Bản Đồ Mật Độ Khách Theo Khu Vực</h5>
-                        <p class="text-secondary small mb-0">Độ đậm nhạt thể hiện mật độ khách tập trung đông đảo nhất</p>
-                    </div>
-                    <div class="text-end">
-                        <span class="text-muted small d-block" style="font-size: 0.75rem;">Tổng Lượng Khách</span>
-                        <span class="fw-bold text-dark fs-6">@Model.TotalAnnualGuests.ToString("N0") lượt khách</span>
-                    </div>
-                </div>
-
-                <!-- Thang đo độ đậm nhạt (Monochrome Density Legend) -->
-                <div class="mb-3 px-2">
-                    <div class="d-flex justify-content-between align-items-center small text-secondary mb-1" style="font-size: 0.75rem;">
-                        <span><i class="bi bi-circle-fill text-muted me-1" style="font-size: 0.6rem;"></i>Mật độ thấp (Xám nhạt)</span>
-                        <span class="fw-medium text-dark">Thang Độ Đậm Nhạt (Monochrome Scale)</span>
-                        <span><i class="bi bi-circle-fill text-dark me-1" style="font-size: 0.6rem;"></i>Mật độ đông đảo nhất (Đen than)</span>
-                    </div>
-                    <div class="density-scale-bar"></div>
-                </div>
-
-                <!-- Khung Bản Đồ Tương Tác Việt Nam Thể Hiện Tọa Độ Và Sắc Độ Các Khu Vực -->
-                <div class="map-visual-container">
-                    <!-- SVG Sơ Đồ Định Vị Dải Đất Việt Nam Tối Giản -->
-                    <svg viewBox="0 0 400 520" style="width: 100%; max-width: 380px; height: 100%;" class="mx-auto">
-                        <!-- Đường vẽ mô phỏng bản đồ Việt Nam tối giản -->
-                        <path d="M 170 30 Q 210 35 240 70 Q 220 110 200 140 Q 230 180 250 230 Q 270 290 260 350 Q 240 410 190 450 Q 150 480 130 500 Q 110 470 140 430 Q 180 390 190 330 Q 170 270 150 220 Q 140 160 160 110 Z" 
-                              fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" stroke-linejoin="round" />
-                        
-                        <!-- Quần đảo Hoàng Sa & Trường Sa tượng trưng -->
-                        <circle cx="310" cy="240" r="3" fill="#cbd5e1" />
-                        <circle cx="325" cy="255" r="2.5" fill="#cbd5e1" />
-                        <text x="300" y="270" font-size="8" fill="#94a3b8">Hoàng Sa</text>
-                        
-                        <circle cx="290" cy="380" r="2.5" fill="#cbd5e1" />
-                        <circle cx="305" cy="395" r="3" fill="#cbd5e1" />
-                        <text x="280" y="410" font-size="8" fill="#94a3b8">Trường Sa</text>
-                    </svg>
-
-                    <!-- Điểm định vị từng khu vực với kích thước và màu sắc độ đậm nhạt tương ứng -->
-                    <!-- 1. Hà Nội (Rank 2: Rất đậm - #1e293b, Top Bắc) -->
-                    <div class="map-node" style="top: 19%; left: 47%; width: 44px; height: 44px; background-color: #1e293b;" 
-                         data-bs-toggle="tooltip" data-bs-html="true" 
-                         title="<strong>Hà Nội</strong><br/>Khách: 2,340 (25.8%)<br/>Đơn đặt: 1,180<br/>Mật độ: Rất cao">
-                        25.8%
-                    </div>
-                    <div class="map-label" style="top: 13%; left: 47%;">Hà Nội</div>
-
-                    <!-- 2. Đà Nẵng (Rank 3: Đậm - #334155, Miền Trung) -->
-                    <div class="map-node" style="top: 42%; left: 56%; width: 38px; height: 38px; background-color: #334155;"
-                         data-bs-toggle="tooltip" data-bs-html="true"
-                         title="<strong>Đà Nẵng</strong><br/>Khách: 1,580 (17.4%)<br/>Đơn đặt: 790<br/>Mật độ: Cao">
-                        17.4%
-                    </div>
-                    <div class="map-label" style="top: 38%; left: 63%;">Đà Nẵng</div>
-
-                    <!-- 3. Nha Trang (Rank 4: Xám đậm vừa - #475569) -->
-                    <div class="map-node" style="top: 61%; left: 62%; width: 34px; height: 34px; background-color: #475569;"
-                         data-bs-toggle="tooltip" data-bs-html="true"
-                         title="<strong>Nha Trang</strong><br/>Khách: 1,020 (11.3%)<br/>Đơn đặt: 510<br/>Mật độ: Cao">
-                        11.3%
-                    </div>
-                    <div class="map-label" style="top: 58%; left: 70%;">Nha Trang</div>
-
-                    <!-- 4. Đà Lạt (Rank 6: Xám nhạt vừa - #94a3b8) -->
-                    <div class="map-node" style="top: 67%; left: 52%; width: 28px; height: 28px; background-color: #94a3b8;"
-                         data-bs-toggle="tooltip" data-bs-html="true"
-                         title="<strong>Đà Lạt</strong><br/>Khách: 440 (4.9%)<br/>Đơn đặt: 240<br/>Mật độ: Trung bình">
-                        4.9%
-                    </div>
-                    <div class="map-label" style="top: 66%; left: 36%;">Đà Lạt</div>
-
-                    <!-- 5. TP. Hồ Chí Minh (Rank 1: ĐẬM NHẤT - #0f172a, Miền Nam) -->
-                    <div class="map-node" style="top: 76%; left: 47%; width: 50px; height: 50px; background-color: #0f172a;"
-                         data-bs-toggle="tooltip" data-bs-html="true"
-                         title="<strong>TP. Hồ Chí Minh</strong><br/>Khách: 2,850 (31.5%) - ĐÔNG ĐẢO NHẤT<br/>Đơn đặt: 1,420<br/>Mật độ: Cực cao">
-                        31.5%
-                    </div>
-                    <div class="map-label" style="top: 74%; left: 24%;">TP. Hồ Chí Minh</div>
-
-                    <!-- 6. Vũng Tàu (Rank 5: Xám trung tính - #64748b) -->
-                    <div class="map-node" style="top: 80%; left: 57%; width: 30px; height: 30px; background-color: #64748b;"
-                         data-bs-toggle="tooltip" data-bs-html="true"
-                         title="<strong>Vũng Tàu</strong><br/>Khách: 590 (6.5%)<br/>Đơn đặt: 310<br/>Mật độ: Trung bình">
-                        6.5%
-                    </div>
-                    <div class="map-label" style="top: 82%; left: 63%;">Vũng Tàu</div>
-
-                    <!-- 7. Cần Thơ (Rank 7: Xám nhạt - #cbd5e1, text-dark) -->
-                    <div class="map-node text-dark" style="top: 87%; left: 39%; width: 26px; height: 26px; background-color: #cbd5e1;"
-                         data-bs-toggle="tooltip" data-bs-html="true"
-                         title="<strong>Cần Thơ</strong><br/>Khách: 240 (2.6%)<br/>Đơn đặt: 130<br/>Mật độ: Tiêu chuẩn">
-                        2.6%
-                    </div>
-                    <div class="map-label" style="top: 88%; left: 21%;">Cần Thơ</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bảng Phân Tích Mật Độ Chi Tiết Theo Khu Vực -->
-        <div class="col-xl-5">
-            <div class="mono-card p-4 h-100">
-                <div class="d-flex justify-content-between align-items-start mb-3 pb-2 border-bottom border-light-subtle">
-                    <div>
-                        <h5 class="fw-bold text-dark mb-1" style="font-size: 1.05rem;">Chi Tiết Phân Bổ Khách Khu Vực</h5>
-                        <p class="text-secondary small mb-0">Xếp hạng theo mật độ tiếp nhận khách</p>
-                    </div>
-                    <span class="badge bg-dark text-white fw-normal px-2 py-1">7 Khu Vực</span>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
-                        <thead>
-                            <tr class="text-secondary border-bottom">
-                                <th class="ps-0 py-2">Khu Vực</th>
-                                <th class="text-center py-2">Mật Độ</th>
-                                <th class="text-end py-2">Lượng Khách</th>
-                                <th class="text-end pe-0 py-2">Tỷ Trọng</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var city in Model.CityGuestDensities)
-                            {
-                                <tr>
-                                    <td class="ps-0 py-2 fw-semibold text-dark">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: @city.ColorHex; display: inline-block;"></span>
-                                            <span>@city.DisplayName</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center py-2">
-                                        @if (city.DensityLevel == "VERY_HIGH")
-                                        {
-                                            <span class="badge bg-dark text-white border-0" style="font-size: 0.72rem;">Rất đông</span>
-                                        }
-                                        else if (city.DensityLevel == "HIGH")
-                                        {
-                                            <span class="badge bg-secondary text-white border-0" style="font-size: 0.72rem;">Đông đảo</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">Tiêu chuẩn</span>
-                                        }
-                                    </td>
-                                    <td class="text-end py-2 text-dark fw-bold">
-                                        @city.GuestCount.ToString("N0")
-                                    </td>
-                                    <td class="text-end pe-0 py-2">
-                                        <div class="d-flex align-items-center justify-content-end gap-2">
-                                            <div class="progress flex-grow-1" style="height: 6px; width: 50px; background-color: #f1f5f9;">
-                                                <div class="progress-bar" style="width: @(city.PercentageShare)%; background-color: @city.ColorHex;"></div>
-                                            </div>
-                                            <span class="text-secondary small fw-medium" style="min-width: 40px;">@city.PercentageShare.ToString("0.0")%</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-3 pt-3 border-top border-light-subtle d-flex justify-content-between align-items-center small text-secondary">
-                    <span>Thị phần lớn nhất: <strong class="text-dark">TP.HCM & Hà Nội (57.3%)</strong></span>
-                    <a asp-controller="Hotels" asp-action="Index" class="text-dark fw-semibold text-decoration-none">Xem chi nhánh &rarr;</a>
                 </div>
             </div>
         </div>
@@ -353,12 +179,6 @@
 @section Scripts {
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Kích hoạt Bootstrap tooltips cho bản đồ
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-
         // 1. Dữ liệu cho Biểu đồ Xu Hướng Doanh Thu (Monochrome Area Chart)
         var monthlyLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenues.Select(x => x.MonthName)));
         var monthlyRevenues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenues.Select(x => (double)x.TotalRevenue)));
