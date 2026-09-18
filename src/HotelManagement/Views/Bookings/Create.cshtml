@@ -7,72 +7,72 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1 text-muted small">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-controller="Bookings" asp-action="Index" class="text-decoration-none">Đặt phòng</a></li>
+                <ol class="breadcrumb mb-1 text-muted small mono-breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Bookings" asp-action="Index">Đặt phòng</a></li>
                     <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Tạo mới</li>
                 </ol>
             </nav>
-            <h2 class="h3 fw-bold text-dark mb-0">Tạo Đơn Đặt Phòng Mới</h2>
+            <h2 class="h4 fw-bold text-dark mb-0">Tạo Đơn Đặt Phòng Mới</h2>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <a asp-action="Index" class="btn mono-btn-outline btn-sm">
             <i class="bi bi-arrow-left me-1"></i> Quay lại
         </a>
     </div>
 
-    <div class="alert alert-light border shadow-xs d-flex align-items-center gap-2 mb-4">
-        <i class="bi bi-info-circle-fill text-primary fs-5"></i>
+    <div class="p-3 bg-light border rounded-3 d-flex align-items-center gap-2 mb-4">
+        <i class="bi bi-info-circle text-dark fs-5"></i>
         <span class="small text-secondary">
             Sau khi xác nhận đặt phòng, hệ thống sẽ tự động cập nhật trạng thái buồng phòng sang <strong>Đang có khách (OCCUPIED)</strong> và tính toán chi phí lưu trú.
         </span>
     </div>
 
-    <form asp-action="Create" method="post" class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+    <form asp-action="Create" method="post" class="mono-card overflow-hidden">
         <div class="card-header bg-white py-3 px-4 border-bottom">
-            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-calendar2-check text-primary me-2"></i>Thông Tin Đặt Phòng</h6>
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-calendar2-check text-dark me-2"></i>Thông Tin Đặt Phòng</h6>
         </div>
         <div class="card-body p-4">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-secondary border small mb-4"></div>
 
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label asp-for="GuestId" class="form-label fw-semibold">Mã Khách Hàng</label>
-                    <input asp-for="GuestId" class="form-control" placeholder="Ví dụ: GUEST001" required />
-                    <div class="form-text">Nhập mã định danh khách hàng đã đăng ký</div>
+                    <label asp-for="GuestId" class="form-label fw-semibold small text-uppercase text-secondary">Mã Khách Hàng</label>
+                    <input asp-for="GuestId" class="form-control mono-form-control" placeholder="Ví dụ: GUEST001" required />
+                    <div class="form-text text-muted small">Nhập mã định danh khách hàng đã đăng ký</div>
                 </div>
 
                 <div class="col-md-6">
-                    <label asp-for="HotelId" class="form-label fw-semibold">Mã Chi Nhánh Khách Sạn</label>
-                    <input asp-for="HotelId" class="form-control" placeholder="Ví dụ: HTL001" required />
-                    <div class="form-text">Mã khách sạn tiếp nhận đặt phòng</div>
+                    <label asp-for="HotelId" class="form-label fw-semibold small text-uppercase text-secondary">Mã Chi Nhánh Khách Sạn</label>
+                    <input asp-for="HotelId" class="form-control mono-form-control" placeholder="Ví dụ: HTL001" required />
+                    <div class="form-text text-muted small">Mã khách sạn tiếp nhận đặt phòng</div>
                 </div>
 
                 <div class="col-md-4">
-                    <label asp-for="RoomNumber" class="form-label fw-semibold">Số Phòng</label>
-                    <input asp-for="RoomNumber" type="number" class="form-control" placeholder="Ví dụ: 101" min="1" required />
+                    <label asp-for="RoomNumber" class="form-label fw-semibold small text-uppercase text-secondary">Số Phòng</label>
+                    <input asp-for="RoomNumber" type="number" class="form-control mono-form-control" placeholder="Ví dụ: 101" min="1" required />
                 </div>
 
                 <div class="col-md-4">
-                    <label asp-for="CheckInDate" class="form-label fw-semibold">Ngày Nhận Phòng (Check-in)</label>
-                    <input asp-for="CheckInDate" type="date" class="form-control" required />
+                    <label asp-for="CheckInDate" class="form-label fw-semibold small text-uppercase text-secondary">Ngày Nhận Phòng (Check-in)</label>
+                    <input asp-for="CheckInDate" type="date" class="form-control mono-form-control" required />
                 </div>
 
                 <div class="col-md-4">
-                    <label asp-for="CheckOutDate" class="form-label fw-semibold">Ngày Trả Phòng (Check-out)</label>
-                    <input asp-for="CheckOutDate" type="date" class="form-control" required />
+                    <label asp-for="CheckOutDate" class="form-label fw-semibold small text-uppercase text-secondary">Ngày Trả Phòng (Check-out)</label>
+                    <input asp-for="CheckOutDate" type="date" class="form-control mono-form-control" required />
                 </div>
             </div>
 
-            <hr class="my-4" />
-            <div class="d-flex align-items-center gap-2 text-muted small">
-                <i class="bi bi-calculator text-primary"></i>
+            <hr class="my-4 border-secondary-subtle" />
+            <div class="d-flex align-items-center gap-2 text-secondary small">
+                <i class="bi bi-calculator text-dark"></i>
                 <span>Tổng tiền lưu trú sẽ được tính toán tự động dựa trên đơn giá phòng và số đêm lưu trú thực tế.</span>
             </div>
         </div>
         <div class="card-footer bg-white p-3 px-4 border-top d-flex gap-2 justify-content-end">
-            <a asp-action="Index" class="btn btn-light border px-4">Hủy bỏ</a>
-            <button type="submit" class="btn btn-primary px-4 fw-semibold">
-                <i class="bi bi-calendar-check me-1"></i> Xác Nhận Đặt Phòng
+            <a asp-action="Index" class="btn mono-btn-outline px-4">Hủy bỏ</a>
+            <button type="submit" class="btn mono-btn-dark px-4 fw-semibold">
+                <i class="bi bi-check2 me-1"></i> Xác Nhận Đặt Phòng
             </button>
         </div>
     </form>

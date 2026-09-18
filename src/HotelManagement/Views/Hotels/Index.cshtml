@@ -7,83 +7,81 @@
     <!-- Tiêu đề & Breadcrumb -->
     <div class="d-md-flex justify-content-between align-items-center mb-4">
         <div>
-            <nav aria-label="breadcrumb">
+            <nav aria-label="breadcrumb" class="mono-breadcrumb">
                 <ol class="breadcrumb mb-1 text-muted small">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
                     <li class="breadcrumb-item text-secondary">Quản lý cơ sở</li>
                     <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Khách sạn</li>
                 </ol>
             </nav>
-            <h2 class="h3 fw-bold text-dark mb-0">Danh Mục Cơ Sở Khách Sạn</h2>
+            <h1 class="h3 fw-bold text-dark mb-0">Danh Mục Cơ Sở Khách Sạn</h1>
         </div>
         <div class="mt-3 mt-md-0 d-flex gap-2">
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
+            <span class="mono-badge-dark px-3 py-2 fs-6">
                 <i class="bi bi-buildings me-1"></i> @Model.TotalCount Cơ sở
             </span>
         </div>
     </div>
 
     <!-- Thanh công cụ tìm kiếm & lọc Admin -->
-    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
-        <div class="card-body p-3 p-md-4">
-            <form method="get" asp-controller="Hotels" asp-action="Index" class="row g-3 align-items-end">
-                <!-- Lọc Thành phố -->
-                <div class="col-md-4 col-lg-3">
-                    <label class="form-label small fw-bold text-secondary mb-1">
-                        <i class="bi bi-geo-alt text-danger me-1"></i> Khu Vực / Thành Phố:
-                    </label>
-                    <select name="city" class="form-select form-select-sm border-secondary-subtle">
-                        <option value="">-- Tất cả thành phố --</option>
-                        @foreach (var c in Model.AvailableCities)
-                        {
-                            <option value="@c" selected="@(Model.SelectedCity == c)">@c</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Lọc Số sao -->
-                <div class="col-md-3 col-lg-2">
-                    <label class="form-label small fw-bold text-secondary mb-1">
-                        <i class="bi bi-star-fill text-warning me-1"></i> Tiêu Chuẩn Sao:
-                    </label>
-                    <select name="starRating" class="form-select form-select-sm border-secondary-subtle">
-                        <option value="">-- Tất cả --</option>
-                        <option value="5" selected="@(Model.SelectedStarRating == 5)">5 Sao (★★★★★)</option>
-                        <option value="4" selected="@(Model.SelectedStarRating == 4)">4 Sao (★★★★☆)</option>
-                        <option value="3" selected="@(Model.SelectedStarRating == 3)">3 Sao (★★★☆☆)</option>
-                    </select>
-                </div>
-
-                <!-- Tìm kiếm từ khóa -->
-                <div class="col-md-3 col-lg-4">
-                    <label class="form-label small fw-bold text-secondary mb-1">
-                        <i class="bi bi-search text-primary me-1"></i> Tìm Kiếm Tên / Địa Chỉ:
-                    </label>
-                    <input type="text" name="search" value="@Model.SearchKeyword" class="form-control form-select-sm border-secondary-subtle" placeholder="Nhập tên khách sạn hoặc địa chỉ..." />
-                </div>
-
-                <!-- Nút thao tác -->
-                <div class="col-md-2 col-lg-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold flex-grow-1 shadow-xs">
-                        <i class="bi bi-funnel me-1"></i> Lọc Cơ Sở
-                    </button>
-                    @if (!string.IsNullOrEmpty(Model.SelectedCity) || Model.SelectedStarRating.HasValue || !string.IsNullOrEmpty(Model.SearchKeyword))
+    <div class="mono-card p-3 p-md-4 mb-4">
+        <form method="get" asp-controller="Hotels" asp-action="Index" class="row g-3 align-items-end">
+            <!-- Lọc Thành phố -->
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label small fw-bold text-secondary mb-1">
+                    <i class="bi bi-geo-alt text-dark me-1"></i> Khu Vực / Thành Phố:
+                </label>
+                <select name="city" class="form-select form-select-sm border-secondary-subtle">
+                    <option value="">-- Tất cả thành phố --</option>
+                    @foreach (var c in Model.AvailableCities)
                     {
-                        <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3" title="Đặt lại bộ lọc">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                        </a>
+                        <option value="@c" selected="@(Model.SelectedCity == c)">@c</option>
                     }
-                </div>
-            </form>
-        </div>
+                </select>
+            </div>
+
+            <!-- Lọc Số sao -->
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label small fw-bold text-secondary mb-1">
+                    <i class="bi bi-star-fill text-dark me-1"></i> Tiêu Chuẩn Sao:
+                </label>
+                <select name="starRating" class="form-select form-select-sm border-secondary-subtle">
+                    <option value="">-- Tất cả --</option>
+                    <option value="5" selected="@(Model.SelectedStarRating == 5)">5 Sao (★★★★★)</option>
+                    <option value="4" selected="@(Model.SelectedStarRating == 4)">4 Sao (★★★★☆)</option>
+                    <option value="3" selected="@(Model.SelectedStarRating == 3)">3 Sao (★★★☆☆)</option>
+                </select>
+            </div>
+
+            <!-- Tìm kiếm từ khóa -->
+            <div class="col-md-3 col-lg-4">
+                <label class="form-label small fw-bold text-secondary mb-1">
+                    <i class="bi bi-search text-dark me-1"></i> Tìm Kiếm Tên / Địa Chỉ:
+                </label>
+                <input type="text" name="search" value="@Model.SearchKeyword" class="form-control form-select-sm border-secondary-subtle" placeholder="Nhập tên khách sạn hoặc địa chỉ..." />
+            </div>
+
+            <!-- Nút thao tác -->
+            <div class="col-md-2 col-lg-3 d-flex gap-2">
+                <button type="submit" class="mono-btn-dark btn-sm px-3 flex-grow-1 justify-content-center">
+                    <i class="bi bi-funnel me-1"></i> Lọc Cơ Sở
+                </button>
+                @if (!string.IsNullOrEmpty(Model.SelectedCity) || Model.SelectedStarRating.HasValue || !string.IsNullOrEmpty(Model.SearchKeyword))
+                {
+                    <a asp-action="Index" class="mono-btn-outline btn-sm px-3" title="Đặt lại bộ lọc">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                }
+            </div>
+        </form>
     </div>
 
     <!-- Bảng Dữ Liệu Khách Sạn -->
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+    <div class="mono-card overflow-hidden">
         <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
             <div class="fw-bold text-dark">
-                <i class="bi bi-table me-2 text-primary"></i>Danh Sách Chi Nhánh
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2">
+                <i class="bi bi-table me-2 text-dark"></i>Danh Sách Chi Nhánh
+                <span class="mono-badge-light ms-2">
                     @Model.TotalCount khách sạn
                 </span>
             </div>
@@ -94,7 +92,7 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-secondary small text-uppercase fw-semibold">
+                <thead class="bg-light text-secondary small text-uppercase fw-semibold">
                     <tr>
                         <th style="width: 60px;" class="text-center">#</th>
                         <th style="width: 120px;">Mã KS</th>
@@ -115,7 +113,7 @@
                             <tr>
                                 <td class="text-center text-muted small">@stt</td>
                                 <td>
-                                    <span class="badge bg-secondary-subtle text-secondary-emphasis font-monospace px-2 py-1">
+                                    <span class="mono-badge-light font-monospace">
                                         @hotel.HotelId
                                     </span>
                                 </td>
@@ -123,29 +121,29 @@
                                     <div class="fw-bold text-dark">@hotel.HotelName</div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-2 py-1">
-                                        <i class="bi bi-geo-alt me-1"></i>@hotel.City
+                                    <span class="mono-badge-light">
+                                        <i class="bi bi-geo-alt me-1 text-secondary"></i>@hotel.City
                                     </span>
                                 </td>
                                 <td class="text-secondary small">@hotel.Address</td>
                                 <td class="text-center">
-                                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2 py-1">
+                                    <span class="mono-badge-dark">
                                         @hotel.StarRating ★
                                     </span>
                                 </td>
                                 <td class="font-monospace small text-secondary">
-                                    <a href="tel:@hotel.Phone" class="text-decoration-none text-secondary">
+                                    <a href="tel:@hotel.Phone" class="text-decoration-none text-dark">
                                         @hotel.Phone
                                     </a>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group btn-group-sm">
                                         <a asp-controller="Hotels" asp-action="Details" asp-route-id="@hotel.HotelId" 
-                                           class="btn btn-outline-primary" title="Xem thông tin chi tiết">
+                                           class="mono-btn-outline btn-sm" title="Xem thông tin chi tiết">
                                             <i class="bi bi-eye"></i> Chi tiết
                                         </a>
                                         <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@hotel.HotelId" 
-                                           class="btn btn-outline-success" title="Xem danh sách phòng">
+                                           class="mono-btn-outline btn-sm" title="Xem danh sách phòng">
                                             <i class="bi bi-door-open"></i> Phòng
                                         </a>
                                     </div>
@@ -160,9 +158,9 @@
                             <td colspan="8" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                                    <h6 class="fw-bold">Không tìm thấy khách sạn nào phù hợp</h6>
+                                    <h6 class="fw-bold text-dark">Không tìm thấy khách sạn nào phù hợp</h6>
                                     <p class="small text-secondary mb-3">Vui lòng thử lại với thành phố hoặc từ khóa khác.</p>
-                                    <a asp-action="Index" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                                    <a asp-action="Index" class="mono-btn-dark btn-sm">Xem tất cả</a>
                                 </div>
                             </td>
                         </tr>

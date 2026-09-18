@@ -7,32 +7,32 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1 text-muted small">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-controller="Guests" asp-action="Index" class="text-decoration-none">Khách hàng</a></li>
-                    <li class="breadcrumb-item active text-danger fw-semibold" aria-current="page">Xóa hồ sơ</li>
+                <ol class="breadcrumb mb-1 text-muted small mono-breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Guests" asp-action="Index">Khách hàng</a></li>
+                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Xóa hồ sơ</li>
                 </ol>
             </nav>
-            <h2 class="h3 fw-bold text-danger mb-0">Xác Nhận Xóa Khách Hàng</h2>
+            <h2 class="h4 fw-bold text-dark mb-0">Xác Nhận Xóa Khách Hàng</h2>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <a asp-action="Index" class="btn mono-btn-outline btn-sm">
             <i class="bi bi-arrow-left me-1"></i> Quay lại
         </a>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
-        <div class="card-header bg-danger bg-opacity-10 text-danger py-3 px-4 border-bottom">
-            <h6 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Cảnh Báo Thao Tác Xóa</h6>
+    <div class="mono-card overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-exclamation-triangle text-dark me-2"></i>Cảnh Báo Thao Tác Xóa</h6>
         </div>
         <div class="card-body p-4">
             <p class="text-dark">Bạn có chắc chắn muốn xóa hồ sơ khách hàng <strong>@Model.FullName</strong> (Mã: <code>@Model.GuestId</code>) khỏi hệ thống không?</p>
-            <div class="p-3 bg-light rounded-3 mb-3">
+            <div class="p-3 bg-light border rounded-3 mb-3">
                 <div class="row g-2 small">
-                    <div class="col-sm-4 text-muted">Số điện thoại:</div>
+                    <div class="col-sm-4 text-secondary">Số điện thoại:</div>
                     <div class="col-sm-8 fw-semibold text-dark">@Model.Phone</div>
-                    <div class="col-sm-4 text-muted">Địa chỉ email:</div>
+                    <div class="col-sm-4 text-secondary">Địa chỉ email:</div>
                     <div class="col-sm-8 fw-semibold text-dark">@Model.Email</div>
-                    <div class="col-sm-4 text-muted">Số CCCD/CMND:</div>
+                    <div class="col-sm-4 text-secondary">Số CCCD/CMND:</div>
                     <div class="col-sm-8 fw-semibold text-dark">@Model.NationalId</div>
                 </div>
             </div>
@@ -41,10 +41,10 @@
             </div>
         </div>
         <div class="card-footer bg-white p-3 px-4 border-top d-flex gap-2 justify-content-end">
-            <a asp-action="Index" class="btn btn-light border px-4">Hủy bỏ</a>
+            <a asp-action="Index" class="btn mono-btn-outline px-4">Hủy bỏ</a>
             <form asp-action="Delete" method="post" class="d-inline">
                 <input type="hidden" name="id" value="@Model.GuestId" />
-                <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                <button type="submit" class="btn mono-btn-dark px-4 fw-semibold">
                     <i class="bi bi-trash me-1"></i> Xác Nhận Xóa
                 </button>
             </form>

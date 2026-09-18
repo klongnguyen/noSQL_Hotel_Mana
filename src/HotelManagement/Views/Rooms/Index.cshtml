@@ -7,133 +7,130 @@
     <!-- Tiêu đề & Breadcrumb -->
     <div class="d-md-flex justify-content-between align-items-center mb-4">
         <div>
-            <nav aria-label="breadcrumb">
+            <nav aria-label="breadcrumb" class="mono-breadcrumb">
                 <ol class="breadcrumb mb-1 text-muted small">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
                     <li class="breadcrumb-item text-secondary">Quản lý cơ sở</li>
                     <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Sơ đồ phòng nghỉ</li>
                 </ol>
             </nav>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <h2 class="h3 fw-bold text-dark mb-0">Sơ Đồ & Danh Mục Phòng Nghỉ</h2>
+                <h1 class="h3 fw-bold text-dark mb-0">Sơ Đồ & Danh Mục Phòng Nghỉ</h1>
                 @if (Model.IsFilteredByStatus)
                 {
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <span class="mono-badge-dark">
                         Đang lọc: @Model.SelectedStatus
                     </span>
                 }
             </div>
         </div>
         <div class="mt-3 mt-md-0 d-flex gap-2 flex-wrap align-items-center">
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
+            <span class="mono-badge-dark px-3 py-2 fs-6">
                 <i class="bi bi-door-open me-1"></i> Tổng số @Model.TotalRooms phòng
             </span>
         </div>
     </div>
 
     <!-- Thanh Bộ Lọc: Khách Sạn & Trạng Thái -->
-    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
-        <div class="card-body p-3 p-md-4">
-            <form method="get" asp-controller="Rooms" asp-action="Index" id="roomFilterForm" class="row g-3 align-items-end">
-                <!-- Chọn Khách sạn -->
-                <div class="col-md-5 col-lg-4">
-                    <label class="form-label small fw-bold text-secondary mb-1">
-                        <i class="bi bi-building text-primary me-1"></i> Chọn Chi Nhánh Khách Sạn:
-                    </label>
-                    <select name="hotelId" class="form-select border-primary-subtle shadow-xs" onchange="this.form.submit()">
-                        @foreach (var h in Model.AvailableHotels)
-                        {
-                            <option value="@h.HotelId" selected="@(Model.SelectedHotelId == h.HotelId)">
-                                @h.HotelName — (@h.City)
-                            </option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Lọc theo Trạng thái -->
-                <div class="col-md-4 col-lg-4">
-                    <label class="form-label small fw-bold text-secondary mb-1">
-                        <i class="bi bi-funnel-fill text-success me-1"></i> Trạng Thái Vận Hành:
-                    </label>
-                    <div class="input-group">
-                        <select name="status" class="form-select border-success-subtle shadow-xs" onchange="this.form.submit()">
-                            <option value="ALL" selected="@(Model.SelectedStatus == "ALL" || string.IsNullOrEmpty(Model.SelectedStatus))">
-                                Tất cả trạng thái (@Model.TotalRooms)
-                            </option>
-                            <option value="AVAILABLE" selected="@(Model.SelectedStatus == "AVAILABLE")">
-                                🟢 Phòng trống / Sẵn sàng (@Model.AvailableCount)
-                            </option>
-                            <option value="OCCUPIED" selected="@(Model.SelectedStatus == "OCCUPIED")">
-                                🔴 Đang có khách (@Model.OccupiedCount)
-                            </option>
-                            <option value="MAINTENANCE" selected="@(Model.SelectedStatus == "MAINTENANCE")">
-                                🟡 Đang bảo trì / Dọn dẹp (@Model.MaintenanceCount)
-                            </option>
-                        </select>
-                        @if (Model.IsFilteredByStatus)
-                        {
-                            <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" class="btn btn-outline-secondary" title="Xóa bộ lọc trạng thái">
-                                <i class="bi bi-x-lg"></i>
-                            </a>
-                        }
-                    </div>
-                </div>
-
-                <!-- Khung thông tin khách sạn đang chọn -->
-                <div class="col-md-3 col-lg-4 text-md-end">
-                    @if (Model.CurrentHotel != null)
+    <div class="mono-card p-3 p-md-4 mb-4">
+        <form method="get" asp-controller="Rooms" asp-action="Index" id="roomFilterForm" class="row g-3 align-items-end">
+            <!-- Chọn Khách sạn -->
+            <div class="col-md-5 col-lg-4">
+                <label class="form-label small fw-bold text-secondary mb-1">
+                    <i class="bi bi-building text-dark me-1"></i> Chọn Chi Nhánh Khách Sạn:
+                </label>
+                <select name="hotelId" class="form-select border-secondary-subtle" onchange="this.form.submit()">
+                    @foreach (var h in Model.AvailableHotels)
                     {
-                        <div class="d-inline-block text-start p-2 px-3 bg-light rounded-3 border small">
-                            <div class="fw-bold text-dark">
-                                @Model.CurrentHotel.HotelName 
-                                <span class="badge bg-warning-subtle text-warning-emphasis ms-1">@Model.CurrentHotel.StarRating ★</span>
-                            </div>
-                            <span class="text-secondary">
-                                <i class="bi bi-geo-alt text-danger me-1"></i>@Model.CurrentHotel.Address, @Model.CurrentHotel.City
-                            </span>
-                            <span class="ms-2 text-muted">| Hotline: @Model.CurrentHotel.Phone</span>
-                        </div>
+                        <option value="@h.HotelId" selected="@(Model.SelectedHotelId == h.HotelId)">
+                            @h.HotelName — (@h.City)
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <!-- Lọc theo Trạng thái -->
+            <div class="col-md-4 col-lg-4">
+                <label class="form-label small fw-bold text-secondary mb-1">
+                    <i class="bi bi-funnel text-dark me-1"></i> Trạng Thái Vận Hành:
+                </label>
+                <div class="input-group">
+                    <select name="status" class="form-select border-secondary-subtle" onchange="this.form.submit()">
+                        <option value="ALL" selected="@(Model.SelectedStatus == "ALL" || string.IsNullOrEmpty(Model.SelectedStatus))">
+                            Tất cả trạng thái (@Model.TotalRooms)
+                        </option>
+                        <option value="AVAILABLE" selected="@(Model.SelectedStatus == "AVAILABLE")">
+                            Phòng trống / Sẵn sàng (@Model.AvailableCount)
+                        </option>
+                        <option value="OCCUPIED" selected="@(Model.SelectedStatus == "OCCUPIED")">
+                            Đang có khách (@Model.OccupiedCount)
+                        </option>
+                        <option value="MAINTENANCE" selected="@(Model.SelectedStatus == "MAINTENANCE")">
+                            Đang bảo trì / Dọn dẹp (@Model.MaintenanceCount)
+                        </option>
+                    </select>
+                    @if (Model.IsFilteredByStatus)
+                    {
+                        <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" class="mono-btn-outline" title="Xóa bộ lọc trạng thái">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
                     }
                 </div>
-            </form>
-
-            <!-- Quick Pills (Chuyển nhanh trạng thái 1-click) -->
-            <div class="d-flex gap-2 mt-3 pt-3 border-top flex-wrap align-items-center">
-                <span class="small fw-semibold text-muted me-1">Lọc nhanh:</span>
-                <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="ALL"
-                   class="btn btn-sm rounded-pill @(Model.SelectedStatus == "ALL" || string.IsNullOrEmpty(Model.SelectedStatus) ? "btn-dark shadow-xs" : "btn-outline-secondary")">
-                    Tất cả (@Model.TotalRooms)
-                </a>
-                <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="AVAILABLE"
-                   class="btn btn-sm rounded-pill @(Model.SelectedStatus == "AVAILABLE" ? "btn-success shadow-xs" : "btn-outline-success")">
-                    🟢 Sẵn sàng (@Model.AvailableCount)
-                </a>
-                <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="OCCUPIED"
-                   class="btn btn-sm rounded-pill @(Model.SelectedStatus == "OCCUPIED" ? "btn-danger shadow-xs" : "btn-outline-danger")">
-                    🔴 Có khách (@Model.OccupiedCount)
-                </a>
-                <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="MAINTENANCE"
-                   class="btn btn-sm rounded-pill @(Model.SelectedStatus == "MAINTENANCE" ? "btn-warning text-dark shadow-xs" : "btn-outline-warning text-dark")">
-                    🟡 Bảo trì (@Model.MaintenanceCount)
-                </a>
             </div>
+
+            <!-- Khung thông tin khách sạn đang chọn -->
+            <div class="col-md-3 col-lg-4 text-md-end">
+                @if (Model.CurrentHotel != null)
+                {
+                    <div class="d-inline-block text-start p-2 px-3 bg-light rounded-3 border small">
+                        <div class="fw-bold text-dark">
+                            @Model.CurrentHotel.HotelName 
+                            <span class="mono-badge-dark ms-1">@Model.CurrentHotel.StarRating ★</span>
+                        </div>
+                        <span class="text-secondary">
+                            <i class="bi bi-geo-alt text-secondary me-1"></i>@Model.CurrentHotel.Address, @Model.CurrentHotel.City
+                        </span>
+                        <span class="ms-2 text-muted">| Hotline: @Model.CurrentHotel.Phone</span>
+                    </div>
+                }
+            </div>
+        </form>
+
+        <!-- Quick Pills (Chuyển nhanh trạng thái theo chuẩn Monochrome) -->
+        <div class="d-flex gap-2 mt-3 pt-3 border-top flex-wrap align-items-center">
+            <span class="small fw-semibold text-muted me-1">Lọc nhanh:</span>
+            <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="ALL"
+               class="@(Model.SelectedStatus == "ALL" || string.IsNullOrEmpty(Model.SelectedStatus) ? "mono-btn-dark btn-sm" : "mono-btn-outline btn-sm")">
+                Tất cả (@Model.TotalRooms)
+            </a>
+            <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="AVAILABLE"
+               class="@(Model.SelectedStatus == "AVAILABLE" ? "mono-btn-dark btn-sm" : "mono-btn-outline btn-sm")">
+                Sẵn sàng (@Model.AvailableCount)
+            </a>
+            <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="OCCUPIED"
+               class="@(Model.SelectedStatus == "OCCUPIED" ? "mono-btn-dark btn-sm" : "mono-btn-outline btn-sm")">
+                Đang có khách (@Model.OccupiedCount)
+            </a>
+            <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="MAINTENANCE"
+               class="@(Model.SelectedStatus == "MAINTENANCE" ? "mono-btn-dark btn-sm" : "mono-btn-outline btn-sm")">
+                Đang bảo trì (@Model.MaintenanceCount)
+            </a>
         </div>
     </div>
 
-    <!-- Hàng Thẻ Thống Kê Nhanh (KPI Widgets) -->
+    <!-- Hàng Thẻ Thống Kê Nhanh (KPI Widgets) - Phong Cách Monochrome -->
     <div class="row g-3 mb-4">
         <!-- Tổng phòng -->
         <div class="col-6 col-md-3">
             <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="ALL" class="text-decoration-none">
-                <div class="card border-0 shadow-sm rounded-3 bg-white p-3 h-100 transition-hover @(!Model.IsFilteredByStatus ? "border border-2 border-primary" : "")"
-                     style="transition: all 0.2s ease-in-out; cursor: pointer;">
+                <div class="mono-card p-3 h-100">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">Tổng Phòng Khách Sạn</small>
-                            <h3 class="fw-bold mb-0 text-dark">@Model.TotalRooms</h3>
-                            <span class="small text-muted">Toàn bộ phòng</span>
+                            <small class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">Tổng Buồng Phòng</small>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">@Model.TotalRooms</h3>
+                            <span class="small text-muted">Toàn bộ phòng cơ sở</span>
                         </div>
-                        <div class="fs-2 text-primary"><i class="bi bi-building"></i></div>
+                        <div class="mono-stat-icon"><i class="bi bi-building"></i></div>
                     </div>
                 </div>
             </a>
@@ -142,15 +139,14 @@
         <!-- Sẵn sàng / Trống -->
         <div class="col-6 col-md-3">
             <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="AVAILABLE" class="text-decoration-none">
-                <div class="card border-0 shadow-sm rounded-3 bg-white p-3 h-100 border-start border-success border-4 transition-hover @(Model.SelectedStatus == "AVAILABLE" ? "bg-success-subtle bg-opacity-25" : "")"
-                     style="transition: all 0.2s ease-in-out; cursor: pointer;">
+                <div class="mono-card p-3 h-100">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">Sẵn Sàng / Trống</small>
-                            <h3 class="fw-bold mb-0 text-success">@Model.AvailableCount</h3>
-                            <span class="small text-success fw-semibold">Có thể đặt ngay</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">@Model.AvailableCount</h3>
+                            <span class="small text-muted">Có thể nhận khách</span>
                         </div>
-                        <div class="fs-2 text-success"><i class="bi bi-check-circle"></i></div>
+                        <div class="mono-stat-icon"><i class="bi bi-check-circle"></i></div>
                     </div>
                 </div>
             </a>
@@ -159,15 +155,14 @@
         <!-- Đang có khách -->
         <div class="col-6 col-md-3">
             <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="OCCUPIED" class="text-decoration-none">
-                <div class="card border-0 shadow-sm rounded-3 bg-white p-3 h-100 border-start border-danger border-4 transition-hover @(Model.SelectedStatus == "OCCUPIED" ? "bg-danger-subtle bg-opacity-25" : "")"
-                     style="transition: all 0.2s ease-in-out; cursor: pointer;">
+                <div class="mono-card p-3 h-100">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">Đang Có Khách</small>
-                            <h3 class="fw-bold mb-0 text-danger">@Model.OccupiedCount</h3>
-                            <span class="small text-danger fw-semibold">Đang lưu trú</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">@Model.OccupiedCount</h3>
+                            <span class="small text-muted">Đang lưu trú</span>
                         </div>
-                        <div class="fs-2 text-danger"><i class="bi bi-person-fill-check"></i></div>
+                        <div class="mono-stat-icon"><i class="bi bi-person-check"></i></div>
                     </div>
                 </div>
             </a>
@@ -176,15 +171,14 @@
         <!-- Đang bảo trì -->
         <div class="col-6 col-md-3">
             <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" asp-route-status="MAINTENANCE" class="text-decoration-none">
-                <div class="card border-0 shadow-sm rounded-3 bg-white p-3 h-100 border-start border-warning border-4 transition-hover @(Model.SelectedStatus == "MAINTENANCE" ? "bg-warning-subtle bg-opacity-25" : "")"
-                     style="transition: all 0.2s ease-in-out; cursor: pointer;">
+                <div class="mono-card p-3 h-100">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">Đang Bảo Trì</small>
-                            <h3 class="fw-bold mb-0 text-warning">@Model.MaintenanceCount</h3>
-                            <span class="small text-warning-emphasis fw-semibold">Dọn dẹp / Sửa chữa</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">@Model.MaintenanceCount</h3>
+                            <span class="small text-muted">Dọn dẹp / Sửa chữa</span>
                         </div>
-                        <div class="fs-2 text-warning"><i class="bi bi-tools"></i></div>
+                        <div class="mono-stat-icon"><i class="bi bi-tools"></i></div>
                     </div>
                 </div>
             </a>
@@ -192,27 +186,27 @@
     </div>
 
     <!-- Bảng Quản Trị Danh Sách Phòng -->
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+    <div class="mono-card overflow-hidden">
         <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-door-open-fill fs-5 text-success"></i>
+                <i class="bi bi-door-open fs-5 text-dark"></i>
                 <div class="fw-bold text-dark">
                     Danh Mục Buồng Phòng: 
-                    <span class="text-primary">@(Model.CurrentHotel?.HotelName ?? Model.SelectedHotelId)</span>
+                    <span class="text-dark fw-bold">@(Model.CurrentHotel?.HotelName ?? Model.SelectedHotelId)</span>
                     @if (Model.IsFilteredByStatus)
                     {
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2">
+                        <span class="mono-badge-light ms-2">
                             @Model.SelectedStatus
                         </span>
                     }
                 </div>
             </div>
-            <span class="badge bg-light text-secondary border">Hiển thị: @Model.FilteredCount phòng</span>
+            <span class="mono-badge-light">Hiển thị: @Model.FilteredCount phòng</span>
         </div>
 
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-secondary small text-uppercase fw-semibold">
+                <thead class="bg-light text-secondary small text-uppercase fw-semibold">
                     <tr>
                         <th style="width: 60px;" class="text-center">#</th>
                         <th style="width: 140px;">Số Phòng</th>
@@ -231,26 +225,15 @@
                             <tr>
                                 <td class="text-center text-muted small">@stt</td>
                                 <td>
-                                    <span class="badge bg-dark text-white font-monospace fs-6 px-3 py-1 rounded-2 shadow-xs">
+                                    <span class="mono-badge-dark font-monospace fs-6 px-3 py-1">
                                         P.@room.RoomNumber
                                     </span>
                                 </td>
                                 <td>
                                     <div class="fw-semibold text-dark">
-                                        @if (room.RoomType == "Suite")
-                                        {
-                                            <span class="text-primary fw-bold">👑 @room.RoomType</span>
-                                        }
-                                        else if (room.RoomType == "Deluxe")
-                                        {
-                                            <span class="text-info fw-bold">✨ @room.RoomType</span>
-                                        }
-                                        else
-                                        {
-                                            <span>🛏️ @room.RoomType</span>
-                                        }
+                                        @room.RoomType
                                     </div>
-                                    <small class="text-muted">Chi nhánh: @room.HotelId</small>
+                                    <small class="text-muted font-monospace">@room.HotelId</small>
                                 </td>
                                 <td>
                                     <strong class="text-dark fs-6">@room.PriceFormatted</strong>
@@ -258,9 +241,26 @@
                                 </td>
                                 <td class="text-center">
                                     <a asp-action="Index" asp-route-hotelId="@room.HotelId" asp-route-status="@room.Status" 
-                                       class="badge @room.StatusBadgeClass px-3 py-2 rounded-pill small text-decoration-none"
+                                       class="text-decoration-none"
                                        title="Xem các phòng trạng thái @room.StatusDisplay">
-                                        <i class="bi @room.StatusIcon me-1"></i>@room.StatusDisplay
+                                        @if (room.Status.Equals("AVAILABLE", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="mono-badge-dark">
+                                                <i class="bi bi-check-circle me-1"></i>Sẵn sàng
+                                            </span>
+                                        }
+                                        else if (room.Status.Equals("OCCUPIED", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="mono-badge-secondary">
+                                                <i class="bi bi-person-fill-check me-1"></i>Có khách
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="mono-badge-light">
+                                                <i class="bi bi-tools me-1"></i>Bảo trì
+                                            </span>
+                                        }
                                     </a>
                                 </td>
                                 <td class="text-end pe-4">
@@ -268,15 +268,15 @@
                                     {
                                         <a asp-controller="Bookings" asp-action="Create" 
                                            asp-route-hotelId="@room.HotelId" asp-route-roomNumber="@room.RoomNumber" 
-                                           class="btn btn-outline-success btn-sm fw-semibold shadow-xs">
+                                           class="mono-btn-dark btn-sm">
                                             <i class="bi bi-calendar-plus me-1"></i> Đặt Phòng
                                         </a>
                                     }
                                     else
                                     {
-                                        <button class="btn btn-light btn-sm text-muted border" disabled>
+                                        <span class="text-muted small">
                                             Không khả dụng
-                                        </button>
+                                        </span>
                                     }
                                 </td>
                             </tr>
@@ -289,7 +289,7 @@
                             <td colspan="6" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-door-closed fs-1 d-block mb-2 text-secondary"></i>
-                                    <h6 class="fw-bold">
+                                    <h6 class="fw-bold text-dark">
                                         @(Model.IsFilteredByStatus ? $"Không có phòng nào ở trạng thái [{Model.SelectedStatus}]" : "Chưa có dữ liệu phòng cho khách sạn này")
                                     </h6>
                                     <p class="small text-secondary mb-3">
@@ -297,7 +297,7 @@
                                     </p>
                                     @if (Model.IsFilteredByStatus)
                                     {
-                                        <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" class="btn btn-sm btn-outline-primary">
+                                        <a asp-action="Index" asp-route-hotelId="@Model.SelectedHotelId" class="mono-btn-outline btn-sm">
                                             <i class="bi bi-arrow-counterclockwise me-1"></i> Xem tất cả phòng
                                         </a>
                                     }

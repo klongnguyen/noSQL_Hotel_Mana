@@ -7,25 +7,25 @@
     <!-- Breadcrumb & Tiêu đề -->
     <div class="d-md-flex justify-content-between align-items-center mb-4">
         <div>
-            <nav aria-label="breadcrumb">
+            <nav aria-label="breadcrumb" class="mono-breadcrumb">
                 <ol class="breadcrumb mb-1 text-muted small">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-controller="Hotels" asp-action="Index" class="text-decoration-none">Khách sạn</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Hotels" asp-action="Index">Khách sạn</a></li>
                     <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">@Model.HotelName</li>
                 </ol>
             </nav>
             <div class="d-flex align-items-center gap-2">
-                <h2 class="h3 fw-bold text-dark mb-0">@Model.HotelName</h2>
-                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">
+                <h1 class="h3 fw-bold text-dark mb-0">@Model.HotelName</h1>
+                <span class="mono-badge-dark">
                     Đang hoạt động
                 </span>
             </div>
         </div>
         <div class="mt-3 mt-md-0 d-flex gap-2">
-            <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" class="btn btn-success btn-sm fw-semibold shadow-xs">
+            <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" class="mono-btn-dark btn-sm">
                 <i class="bi bi-door-open me-1"></i> Sơ Đồ Phòng Nghỉ
             </a>
-            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <a asp-action="Index" class="mono-btn-outline btn-sm">
                 <i class="bi bi-arrow-left me-1"></i> Quay lại
             </a>
         </div>
@@ -36,10 +36,10 @@
         <!-- Cột trái: Thông tin quản trị -->
         <div class="col-lg-8">
             <!-- Thẻ Thông tin chung -->
-            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+            <div class="mono-card mb-4">
                 <div class="card-header bg-white py-3 px-4 border-bottom">
                     <h6 class="fw-bold text-dark mb-0">
-                        <i class="bi bi-building-gear me-2 text-primary"></i>Thông Tin Cơ Sở Lưu Trú
+                        <i class="bi bi-building-gear me-2 text-dark"></i>Thông Tin Cơ Sở Lưu Trú
                     </h6>
                 </div>
                 <div class="card-body p-4">
@@ -50,20 +50,20 @@
                         </div>
                         <div class="col-sm-6">
                             <label class="text-muted small d-block">Tiêu chuẩn phân hạng:</label>
-                            <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2 py-1">
+                            <span class="mono-badge-dark">
                                 @Model.StarRating ★ (@Model.StarDisplay)
                             </span>
                         </div>
                         <div class="col-sm-6">
                             <label class="text-muted small d-block">Thành phố / Tỉnh:</label>
                             <span class="fw-semibold text-dark">
-                                <i class="bi bi-geo-alt text-danger me-1"></i>@Model.City
+                                <i class="bi bi-geo-alt text-secondary me-1"></i>@Model.City
                             </span>
                         </div>
                         <div class="col-sm-6">
                             <label class="text-muted small d-block">Số điện thoại liên hệ:</label>
                             <span class="font-monospace fw-semibold text-dark">
-                                <a href="tel:@Model.Phone" class="text-decoration-none">@Model.Phone</a>
+                                <a href="tel:@Model.Phone" class="text-decoration-none text-dark">@Model.Phone</a>
                             </span>
                         </div>
                         <div class="col-12">
@@ -75,12 +75,12 @@
             </div>
 
             <!-- Thẻ Loại phòng nổi bật của khách sạn -->
-            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+            <div class="mono-card mb-4">
                 <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
                     <h6 class="fw-bold text-dark mb-0">
-                        <i class="bi bi-door-open me-2 text-success"></i>Hạng Phòng Tiêu Biểu (@(ViewBag.TotalRooms ?? 0) phòng)
+                        <i class="bi bi-door-open me-2 text-dark"></i>Hạng Phòng Tiêu Biểu (@(ViewBag.TotalRooms ?? 0) phòng)
                     </h6>
-                    <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" class="btn btn-outline-primary btn-sm fw-semibold">
+                    <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" class="mono-btn-outline btn-sm">
                         Xem tất cả phòng &rarr;
                     </a>
                 </div>
@@ -93,13 +93,24 @@
                                 <div class="col-md-6">
                                     <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="badge bg-dark font-monospace mb-1">P.@rm.RoomNumber</span>
+                                            <span class="mono-badge-dark font-monospace mb-1 d-inline-block">P.@rm.RoomNumber</span>
                                             <div class="fw-bold text-dark">@rm.RoomType</div>
-                                            <small class="text-primary fw-semibold">@rm.PriceFormatted / đêm</small>
+                                            <small class="text-secondary fw-semibold">@rm.PriceFormatted / đêm</small>
                                         </div>
                                         <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" asp-route-status="@rm.Status" 
-                                           class="badge @rm.StatusBadgeClass px-2 py-1 small text-decoration-none">
-                                            <i class="bi @rm.StatusIcon me-1"></i>@rm.StatusDisplay &rarr;
+                                           class="text-decoration-none">
+                                            @if (rm.Status == "AVAILABLE")
+                                            {
+                                                <span class="mono-badge-dark">Trống</span>
+                                            }
+                                            else if (rm.Status == "OCCUPIED")
+                                            {
+                                                <span class="mono-badge-secondary">Có khách</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="mono-badge-light">Bảo trì</span>
+                                            }
                                         </a>
                                     </div>
                                 </div>
@@ -108,98 +119,60 @@
                     }
                     else
                     {
-                        <p class="text-muted small mb-0">Chưa có thông tin phòng cho cơ sở này.</p>
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-door-closed fs-2 d-block mb-1 text-secondary"></i>
+                            Chưa có dữ liệu phòng trực thuộc chi nhánh này.
+                        </div>
                     }
-                </div>
-            </div>
-
-            <!-- Thẻ Chính sách vận hành -->
-            <div class="card border-0 shadow-sm rounded-3 bg-white">
-                <div class="card-header bg-white py-3 px-4 border-bottom">
-                    <h6 class="fw-bold text-dark mb-0">
-                        <i class="bi bi-clock-history me-2 text-primary"></i>Quy Định Nhận & Trả Phòng
-                    </h6>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row g-3 text-secondary small">
-                        <div class="col-md-4">
-                            <div class="p-3 bg-light rounded-3 border">
-                                <strong class="text-dark d-block mb-1">🕒 Giờ Check-in:</strong>
-                                <span>Từ 14:00 mỗi ngày</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="p-3 bg-light rounded-3 border">
-                                <strong class="text-dark d-block mb-1">🕚 Giờ Check-out:</strong>
-                                <span>Trước 12:00 trưa</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="p-3 bg-light rounded-3 border">
-                                <strong class="text-dark d-block mb-1">💳 Chính sách Hủy:</strong>
-                                <span>Hỗ trợ hủy miễn phí trước 24h</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Cột phải: Tiện ích & Thao tác quản trị -->
+        <!-- Cột phải: Thao tác & liên kết quản trị nhanh -->
         <div class="col-lg-4">
-            <!-- Tiện ích dịch vụ -->
-            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+            <!-- Thẻ tác vụ nhanh -->
+            <div class="mono-card mb-4">
                 <div class="card-header bg-white py-3 px-4 border-bottom">
                     <h6 class="fw-bold text-dark mb-0">
-                        <i class="bi bi-stars me-2 text-warning"></i>Tiện Ích & Dịch Vụ Khách Sạn
-                    </h6>
-                </div>
-                <div class="card-body p-4">
-                    <ul class="list-unstyled mb-0 small text-secondary">
-                        <li class="mb-2 d-flex align-items-center gap-2">
-                            <i class="bi bi-wifi text-primary fs-6"></i>
-                            <span>Wi-Fi tốc độ cao miễn phí toàn khuôn viên</span>
-                        </li>
-                        <li class="mb-2 d-flex align-items-center gap-2">
-                            <i class="bi bi-cup-hot text-danger fs-6"></i>
-                            <span>Buffet sáng tiêu chuẩn quốc tế</span>
-                        </li>
-                        <li class="mb-2 d-flex align-items-center gap-2">
-                            <i class="bi bi-water text-info fs-6"></i>
-                            <span>Bể bơi 4 mùa & phòng tập Gym</span>
-                        </li>
-                        <li class="mb-2 d-flex align-items-center gap-2">
-                            <i class="bi bi-car-front text-success fs-6"></i>
-                            <span>Dịch vụ đưa đón sân bay 24/7</span>
-                        </li>
-                        <li class="d-flex align-items-center gap-2">
-                            <i class="bi bi-shield-check text-warning fs-6"></i>
-                            <span>Hệ thống an ninh & buồng phòng trực 24h</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Bảng Điều Hướng Nghiệp Vụ -->
-            <div class="card border-0 shadow-sm rounded-3 bg-white">
-                <div class="card-header bg-white py-3 px-4 border-bottom">
-                    <h6 class="fw-bold text-dark mb-0">
-                        <i class="bi bi-lightning-charge me-2 text-primary"></i>Thao Tác Nhanh
+                        <i class="bi bi-lightning me-2 text-dark"></i>Thao Tác Quản Trị
                     </h6>
                 </div>
                 <div class="card-body p-4 d-grid gap-2">
                     <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" 
-                       class="btn btn-primary btn-sm py-2 fw-semibold">
-                        <i class="bi bi-door-open me-2"></i> Xem sơ đồ phòng chi nhánh này
+                       class="mono-btn-dark justify-content-center">
+                        <i class="bi bi-grid-3x3-gap"></i> Xem Sơ Đồ Toàn Bộ Buồng Phòng
+                    </a>
+                    <a asp-controller="Hotels" asp-action="Index" asp-route-city="@Model.City" 
+                       class="mono-btn-outline justify-content-center">
+                        <i class="bi bi-geo-alt"></i> Khách Sạn Cùng Thành Phố (@Model.City)
                     </a>
                     <a asp-controller="Bookings" asp-action="Create" 
-                       class="btn btn-outline-success btn-sm py-2 fw-semibold">
-                        <i class="bi bi-calendar-plus me-2"></i> Lập đơn đặt phòng mới
+                       class="mono-btn-outline justify-content-center">
+                        <i class="bi bi-calendar-plus"></i> Đặt Phòng Tại Cơ Sở Này
                     </a>
-                    <a asp-controller="BookingHistory" asp-action="Index" 
-                       class="btn btn-outline-secondary btn-sm py-2">
-                        <i class="bi bi-clock-history me-2"></i> Tra cứu lịch sử đặt phòng
-                    </a>
+                </div>
+            </div>
+
+            <!-- Thẻ hỗ trợ kỹ thuật vận hành -->
+            <div class="mono-card">
+                <div class="card-header bg-white py-3 px-4 border-bottom">
+                    <h6 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-shield-check me-2 text-dark"></i>Thông Tin Hệ Thống
+                    </h6>
+                </div>
+                <div class="card-body p-4 small text-secondary">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span>Trạng thái CSDL:</span>
+                        <strong class="text-dark">Astra DB Connected</strong>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span>Phân vùng Keyspace:</span>
+                        <span class="font-monospace text-dark">hotel_ks</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span>Chuẩn kiến trúc:</span>
+                        <span class="text-dark">Query-First Partition</span>
+                    </div>
                 </div>
             </div>
         </div>

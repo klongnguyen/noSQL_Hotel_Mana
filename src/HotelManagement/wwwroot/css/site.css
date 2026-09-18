@@ -134,3 +134,92 @@ body {
   color: #ffffff;
   transform: scale(1.1);
 }
+
+/* Nút bấm đen tuyền chuẩn Monochrome */
+.mono-btn-dark {
+  background-color: #0f172a;
+  color: #ffffff;
+  border: 1px solid #0f172a;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.mono-btn-dark:hover {
+  background-color: #1e293b;
+  border-color: #1e293b;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+}
+
+/* Nút bấm viền xám đen tối giản */
+.mono-btn-outline {
+  background-color: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.mono-btn-outline:hover {
+  background-color: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+/* Thẻ Badge Monochrome */
+.mono-badge-dark {
+  background-color: #0f172a;
+  color: #ffffff;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.mono-badge-secondary {
+  background-color: #475569;
+  color: #ffffff;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.mono-badge-light {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+/* Form Control Focus Viền Đen */
+.mono-form-control:focus, .form-select:focus, .form-control:focus {
+  border-color: #0f172a !important;
+  box-shadow: 0 0 0 0.2rem rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Breadcrumb tối giản */
+.mono-breadcrumb .breadcrumb-item a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.mono-breadcrumb .breadcrumb-item a:hover {
+  color: #0f172a;
+}

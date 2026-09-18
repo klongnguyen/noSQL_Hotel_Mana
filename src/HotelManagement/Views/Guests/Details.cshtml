@@ -7,65 +7,65 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1 text-muted small">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-controller="Guests" asp-action="Index" class="text-decoration-none">Khách hàng</a></li>
+                <ol class="breadcrumb mb-1 text-muted small mono-breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Guests" asp-action="Index">Khách hàng</a></li>
                     <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Hồ sơ</li>
                 </ol>
             </nav>
-            <h2 class="h3 fw-bold text-dark mb-0">Hồ Sơ Chi Tiết Khách Hàng</h2>
+            <h2 class="h4 fw-bold text-dark mb-0">Hồ Sơ Chi Tiết Khách Hàng</h2>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <a asp-action="Index" class="btn mono-btn-outline btn-sm">
             <i class="bi bi-arrow-left me-1"></i> Quay lại
         </a>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
+    <div class="mono-card overflow-hidden mb-4">
         <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-person-badge text-primary me-2"></i>Thông Tin Thành Viên</h6>
-            <span class="badge bg-secondary-subtle text-secondary-emphasis font-monospace px-2 py-1">@Model.GuestId</span>
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-person-badge text-dark me-2"></i>Thông Tin Thành Viên</h6>
+            <span class="mono-badge-light font-monospace px-2 py-1">@Model.GuestId</span>
         </div>
         <div class="card-body p-4">
-            <div class="row g-3">
+            <div class="row g-4">
                 <div class="col-sm-6">
-                    <label class="text-muted small d-block">Mã khách hàng:</label>
+                    <label class="text-secondary small text-uppercase fw-semibold d-block mb-1">Mã khách hàng</label>
                     <span class="font-monospace fw-bold text-dark fs-6">@Model.GuestId</span>
                 </div>
                 <div class="col-sm-6">
-                    <label class="text-muted small d-block">Họ và tên:</label>
+                    <label class="text-secondary small text-uppercase fw-semibold d-block mb-1">Họ và tên</label>
                     <span class="fw-bold text-dark fs-6">@Model.FullName</span>
                 </div>
                 <div class="col-sm-6">
-                    <label class="text-muted small d-block">Số điện thoại:</label>
+                    <label class="text-secondary small text-uppercase fw-semibold d-block mb-1">Số điện thoại</label>
                     <span class="text-dark">
                         <a href="tel:@Model.Phone" class="text-decoration-none text-dark fw-semibold">
-                            <i class="bi bi-telephone text-primary me-1"></i>@Model.Phone
+                            <i class="bi bi-telephone text-secondary me-1"></i>@Model.Phone
                         </a>
                     </span>
                 </div>
                 <div class="col-sm-6">
-                    <label class="text-muted small d-block">Địa chỉ email:</label>
+                    <label class="text-secondary small text-uppercase fw-semibold d-block mb-1">Địa chỉ email</label>
                     <span class="text-dark">
                         <a href="mailto:@Model.Email" class="text-decoration-none text-dark">
-                            <i class="bi bi-envelope text-primary me-1"></i>@Model.Email
+                            <i class="bi bi-envelope text-secondary me-1"></i>@Model.Email
                         </a>
                     </span>
                 </div>
                 <div class="col-12">
-                    <label class="text-muted small d-block">Số CCCD / CMND / Hộ Chiếu:</label>
+                    <label class="text-secondary small text-uppercase fw-semibold d-block mb-1">Số CCCD / CMND / Hộ Chiếu</label>
                     <span class="font-monospace fw-semibold text-dark">@Model.NationalId</span>
                 </div>
             </div>
         </div>
         <div class="card-footer bg-white p-3 px-4 border-top d-flex justify-content-between align-items-center">
-            <a asp-controller="BookingHistory" asp-action="Index" asp-route-customerId="@Model.GuestId" class="btn btn-outline-info btn-sm fw-semibold">
+            <a asp-controller="BookingHistory" asp-action="Index" asp-route-customerId="@Model.GuestId" class="btn mono-btn-outline btn-sm fw-semibold">
                 <i class="bi bi-clock-history me-1"></i> Lịch Sử Đặt Phòng
             </a>
             <div class="d-flex gap-2">
-                <a asp-action="Edit" asp-route-id="@Model.GuestId" class="btn btn-warning btn-sm px-3 fw-semibold">
+                <a asp-action="Edit" asp-route-id="@Model.GuestId" class="btn mono-btn-dark btn-sm px-3 fw-semibold">
                     <i class="bi bi-pencil me-1"></i> Chỉnh Sửa
                 </a>
-                <a asp-action="Delete" asp-route-id="@Model.GuestId" class="btn btn-outline-danger btn-sm px-3">
+                <a asp-action="Delete" asp-route-id="@Model.GuestId" class="btn mono-btn-outline btn-sm px-3">
                     <i class="bi bi-trash me-1"></i> Xóa
                 </a>
             </div>
