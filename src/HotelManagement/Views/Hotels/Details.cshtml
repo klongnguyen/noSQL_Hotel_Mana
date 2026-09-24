@@ -63,7 +63,7 @@
                         <div class="col-sm-6">
                             <label class="text-muted small d-block">Số điện thoại liên hệ:</label>
                             <span class="font-monospace fw-semibold text-dark">
-                                <a href="tel:@Model.Phone" class="text-decoration-none text-dark">@Model.Phone</a>
+                                @Model.Phone
                             </span>
                         </div>
                         <div class="col-12">
@@ -97,20 +97,8 @@
                                             <div class="fw-bold text-dark">@rm.RoomType</div>
                                             <small class="text-secondary fw-semibold">@rm.PriceFormatted / đêm</small>
                                         </div>
-                                        <a asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@Model.HotelId" asp-route-status="@rm.Status" 
-                                           class="text-decoration-none">
-                                            @if (rm.Status == "AVAILABLE")
-                                            {
-                                                <span class="mono-badge-dark">Trống</span>
-                                            }
-                                            else if (rm.Status == "OCCUPIED")
-                                            {
-                                                <span class="mono-badge-secondary">Có khách</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="mono-badge-light">Bảo trì</span>
-                                            }
+                                        <a asp-controller="Bookings" asp-action="Create" asp-route-hotelId="@Model.HotelId" asp-route-roomNumber="@rm.RoomNumber" class="mono-btn-dark btn-sm">
+                                            <i class="bi bi-calendar-plus me-1"></i> Đặt Phòng
                                         </a>
                                     </div>
                                 </div>

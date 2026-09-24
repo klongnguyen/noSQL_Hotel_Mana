@@ -199,6 +199,7 @@ Tài liệu này được định dạng chuẩn Jira (Agile/Scrum), phân chia 
   - Cho phép xuất hoặc xem hóa đơn từ màn hình chi tiết Booking.
 - **Acceptance Criteria (DoD)**:
   - [x] Truy vấn lấy hóa đơn theo đúng `booking_id`: `SELECT * FROM invoices_by_booking WHERE booking_id = ?`.
+  - [x] Hỗ trợ phương thức tra cứu nhanh theo [Khách sạn + Số phòng] (`bookings_by_hotel_date` -> `invoices_by_booking`), hiển thị danh sách hóa đơn của phòng để lễ tân chọn xem chi tiết.
   - [x] Hiển thị tính toán chi tiết: `total_amount = room_charge + service_charge + tax`.
 
 #### 🎫 Ticket: `STORY-303`
