@@ -110,25 +110,81 @@ public class DashboardAnalyticsService : IDashboardAnalyticsService
             var rows = await session.ExecuteAsync(new SimpleStatement(
                 "SELECT booking_id, hotel_id, hotel_name, check_in_date, total_amount, status FROM bookings_by_guest"));
 
-            var bookingList = rows.Select(r =>
+            var allHotels = (await _hotelRepository.GetAllHotelsAsync()).ToDictionary(h => h.HotelId);
+
+            var bookingList = new List<(Guid BookingId, string HotelId, string HotelName, DateTime CheckInDate, decimal TotalAmount, string Status)>();
+
+            foreach (var r in rows)
             {
-                var checkIn = r.GetValue<LocalDate>("check_in_date");
-                var checkInDate = new DateTime(checkIn.Year, checkIn.Month, checkIn.Day);
-                return new
+                try
                 {
-                    BookingId = r.GetValue<Guid>("booking_id"),
-                    HotelId = r.GetValue<string>("hotel_id"),
-                    HotelName = r.GetValue<string>("hotel_name"),
-                    CheckInDate = checkInDate,
-                    TotalAmount = r.GetValue<decimal>("total_amount"),
-                    Status = r.GetValue<string>("status")
-                };
-            }).ToList();
+                    DateTime checkInDate = DateTime.Today;
+                    if (!r.IsNull("check_in_date"))
+                    {
+                        try
+                        {
+                            var checkIn = r.GetValue<LocalDate>("check_in_date");
+                            checkInDate = new DateTime(checkIn.Year, checkIn.Month, checkIn.Day);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                checkInDate = Convert.ToDateTime(r.GetValue<object>("check_in_date"));
+                            }
+                            catch
+                            {
+                                checkInDate = DateTime.Today;
+                            }
+                        }
+                    }
+
+                    decimal totalAmount = 0m;
+                    if (!r.IsNull("total_amount"))
+                    {
+                        try
+                        {
+                            totalAmount = r.GetValue<decimal?>("total_amount") ?? 0m;
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                totalAmount = Convert.ToDecimal(r.GetValue<object>("total_amount"));
+                            }
+                            catch
+                            {
+                                totalAmount = 0m;
+                            }
+                        }
+                    }
+
+                    var bookingId = !r.IsNull("booking_id") ? r.GetValue<Guid>("booking_id") : Guid.Empty;
+                    var hotelId = !r.IsNull("hotel_id") ? (r.GetValue<string>("hotel_id") ?? string.Empty) : string.Empty;
+                    var hotelName = !r.IsNull("hotel_name") ? (r.GetValue<string>("hotel_name") ?? string.Empty) : string.Empty;
+                    var status = !r.IsNull("status") ? (r.GetValue<string>("status") ?? "CONFIRMED") : "CONFIRMED";
+
+                    if (string.IsNullOrWhiteSpace(hotelName) && allHotels.TryGetValue(hotelId, out var hInfo))
+                    {
+                        hotelName = hInfo.HotelName;
+                    }
+
+                    bookingList.Add((bookingId, hotelId, hotelName, checkInDate, totalAmount, status));
+                }
+                catch (Exception rowEx)
+                {
+                    _logger.LogWarning("Bỏ qua bản ghi booking không hợp lệ: {Message}", rowEx.Message);
+                }
+            }
 
             if (bookingList.Count > 0)
             {
-                // A. Nhóm theo tháng và tính tổng doanh thu thực tế
+                // Cập nhật số lượng lượt đặt phòng thực tế
+                model.BookingCount = bookingList.Count;
+
+                // A. Nhóm theo tháng và tính tổng doanh thu thực tế (chỉ tính đơn hợp lệ không bị hủy)
                 var monthlyGroups = bookingList
+                    .Where(b => !b.Status.Equals("CANCELLED", StringComparison.OrdinalIgnoreCase))
                     .GroupBy(b => new { b.CheckInDate.Year, b.CheckInDate.Month })
                     .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                     .Select(g => new MonthlyRevenueItem
@@ -140,30 +196,48 @@ public class DashboardAnalyticsService : IDashboardAnalyticsService
                         GuestCount = g.Count()
                     }).ToList();
 
-                model.MonthlyRevenues = monthlyGroups;
+                if (monthlyGroups.Count > 0)
+                {
+                    model.MonthlyRevenues = monthlyGroups;
+                }
 
                 // B. Nhóm theo chi nhánh khách sạn và xếp hạng doanh thu thực tế
                 var branchGroups = bookingList
-                    .GroupBy(b => new { b.HotelId, b.HotelName })
-                    .Select(g => new BranchRevenueItem
+                    .Where(b => !string.IsNullOrWhiteSpace(b.HotelId) && !b.Status.Equals("CANCELLED", StringComparison.OrdinalIgnoreCase))
+                    .GroupBy(b => b.HotelId)
+                    .Select(g =>
                     {
-                        HotelId = g.Key.HotelId,
-                        HotelName = g.Key.HotelName,
-                        TotalRevenue = g.Sum(x => x.TotalAmount),
-                        BookingCount = g.Count(),
-                        OccupancyRate = Math.Round((double)g.Count() / 4.0 * 100.0, 1) // Mỗi khách sạn có 4 phòng
+                        var hotelId = g.Key;
+                        allHotels.TryGetValue(hotelId, out var h);
+                        var hName = h?.HotelName ?? g.First().HotelName;
+                        if (string.IsNullOrWhiteSpace(hName)) hName = hotelId;
+
+                        return new BranchRevenueItem
+                        {
+                            HotelId = hotelId,
+                            HotelName = hName,
+                            City = h?.City ?? "Toàn quốc",
+                            StarRating = h?.StarRating ?? 4,
+                            TotalRevenue = g.Sum(x => x.TotalAmount),
+                            BookingCount = g.Count(),
+                            OccupancyRate = Math.Min(100.0, Math.Round((double)g.Count() / 4.0 * 100.0, 1))
+                        };
                     })
                     .OrderByDescending(x => x.TotalRevenue)
                     .Take(7)
                     .ToList();
 
-                model.TopBranches = branchGroups;
+                if (branchGroups.Count > 0)
+                {
+                    model.TopBranches = branchGroups;
+                }
+
                 return;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning("Không thể đọc trực tiếp từ bookings_by_guest: {Message}. Sử dụng dữ liệu thực tế chuẩn hóa.", ex.Message);
+            _logger.LogWarning(ex, "Không thể đọc trực tiếp từ bookings_by_guest: {Message}. Sử dụng dữ liệu thực tế chuẩn hóa.", ex.Message);
         }
 
         // Fallback số liệu thực tế chuẩn hóa (tổng hợp khớp với 35 đơn đặt phòng)

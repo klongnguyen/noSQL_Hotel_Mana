@@ -259,6 +259,8 @@
                                     return (value / 1000000000).toFixed(1) + ' tỷ';
                                 } else if (value >= 1000000) {
                                     return (value / 1000000).toFixed(0) + ' tr';
+                                } else if (value >= 1000) {
+                                    return (value / 1000).toFixed(0) + ' k';
                                 }
                                 return value;
                             }
@@ -323,7 +325,14 @@
                                 size: 10
                             },
                             callback: function (value) {
-                                return (value / 1000000000).toFixed(1) + ' tỷ';
+                                if (value >= 1000000000) {
+                                    return (value / 1000000000).toFixed(1) + ' tỷ';
+                                } else if (value >= 1000000) {
+                                    return (value / 1000000).toFixed(1) + ' tr';
+                                } else if (value >= 1000) {
+                                    return (value / 1000).toFixed(0) + ' k';
+                                }
+                                return value;
                             }
                         }
                     },
