@@ -105,22 +105,66 @@ public class BookingsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRooms(string hotelId)
+    public async Task<IActionResult> GetRooms(string hotelId, DateTime? checkIn = null, DateTime? checkOut = null)
     {
         if (string.IsNullOrWhiteSpace(hotelId)) return Json(new List<object>());
         try
         {
             var rooms = (await _roomRepository.GetRoomsByHotelAsync(hotelId.Trim()))
                 .OrderBy(r => r.RoomNumber)
-                .Select(r => new
+                .ToList();
+
+            List<Booking> activeBookings = new();
+            bool checkDates = checkIn.HasValue && checkOut.HasValue && checkOut.Value.Date > checkIn.Value.Date;
+            DateTime inDate = DateTime.MinValue;
+            DateTime outDate = DateTime.MinValue;
+            if (checkDates)
+            {
+                inDate = checkIn!.Value.Date;
+                outDate = checkOut!.Value.Date;
+                var allBookings = await _bookingRepository.GetByHotelAsync(hotelId.Trim());
+                activeBookings = allBookings
+                    .Where(b => !b.Status.Equals("CANCELLED", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            var result = rooms.Select(r =>
+            {
+                bool isAvailable = true;
+                string conflictReason = string.Empty;
+
+                if (r.Status.Equals("MAINTENANCE", StringComparison.OrdinalIgnoreCase))
+                {
+                    isAvailable = false;
+                    conflictReason = "Phòng đang bảo trì";
+                }
+                else if (checkDates)
+                {
+                    var conflict = activeBookings.FirstOrDefault(b =>
+                        b.RoomNumber == r.RoomNumber &&
+                        inDate < b.CheckOutDate.Date &&
+                        outDate > b.CheckInDate.Date);
+
+                    if (conflict != null)
+                    {
+                        isAvailable = false;
+                        conflictReason = $"Đã có khách đặt ({conflict.CheckInDate:dd/MM} - {conflict.CheckOutDate:dd/MM})";
+                    }
+                }
+
+                return new
                 {
                     roomNumber = r.RoomNumber,
                     roomType = r.RoomType,
                     pricePerNight = r.PricePerNight,
                     status = r.Status,
-                    capacity = r.Capacity
-                });
-            return Json(rooms);
+                    capacity = r.Capacity,
+                    isAvailable = isAvailable,
+                    conflictReason = conflictReason
+                };
+            });
+
+            return Json(result);
         }
         catch (Exception ex)
         {
@@ -248,10 +292,20 @@ public class BookingsController : Controller
         if (guest != null)
         {
             // Người đại diện (Người 1)
+            var primaryCid = !string.IsNullOrWhiteSpace(guest.NationalId) ? guest.NationalId.Trim() : string.Empty;
+            if (string.IsNullOrWhiteSpace(primaryCid))
+            {
+                ModelState.AddModelError(nameof(booking.GuestId), $"Khách hàng '{guest.FullName}' chưa có số Căn cước công dân trong hồ sơ. Vui lòng cập nhật hồ sơ khách trước.");
+            }
+            else if (!System.Text.RegularExpressions.Regex.IsMatch(primaryCid, @"^\d{12}$"))
+            {
+                ModelState.AddModelError(nameof(booking.GuestId), $"Số Căn cước công dân của khách hàng '{guest.FullName}' ({primaryCid}) không hợp lệ (phải gồm đúng 12 chữ số). Vui lòng cập nhật hồ sơ khách trước.");
+            }
+
             validOccupants.Add(new RoomOccupant
             {
                 FullName = guest.FullName,
-                CitizenId = !string.IsNullOrWhiteSpace(guest.NationalId) ? guest.NationalId : guest.GuestId,
+                CitizenId = !string.IsNullOrWhiteSpace(primaryCid) ? primaryCid : guest.GuestId,
                 DateOfBirth = null,
                 IsPrimary = true
             });
@@ -274,7 +328,23 @@ public class BookingsController : Controller
                     }
                     if (string.IsNullOrWhiteSpace(occCid))
                     {
-                        ModelState.AddModelError($"Occupants[{i}].CitizenId", $"Vui lòng nhập số CCCD/CMND cho người ở cùng thứ {i + 1}.");
+                        ModelState.AddModelError($"Occupants[{i}].CitizenId", $"Vui lòng nhập số Căn cước công dân (CCCD) cho người ở cùng thứ {i + 1}.");
+                    }
+                    else if (!System.Text.RegularExpressions.Regex.IsMatch(occCid, @"^\d{12}$"))
+                    {
+                        ModelState.AddModelError($"Occupants[{i}].CitizenId", $"Số Căn cước công dân của người ở cùng thứ {i + 1} ({occCid}) không hợp lệ (phải gồm đúng 12 chữ số).");
+                    }
+
+                    if (occInput?.DateOfBirth.HasValue == true)
+                    {
+                        if (occInput.DateOfBirth.Value.Date > DateTime.Today)
+                        {
+                            ModelState.AddModelError($"Occupants[{i}].DateOfBirth", $"Ngày sinh của người ở cùng thứ {i + 1} không thể là ngày trong tương lai.");
+                        }
+                        else if (occInput.DateOfBirth.Value.Year < 1900)
+                        {
+                            ModelState.AddModelError($"Occupants[{i}].DateOfBirth", $"Năm sinh của người ở cùng thứ {i + 1} không hợp lệ (phải từ năm 1900 trở lại đây).");
+                        }
                     }
 
                     validOccupants.Add(new RoomOccupant

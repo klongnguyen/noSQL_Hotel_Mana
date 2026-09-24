@@ -11,6 +11,7 @@ namespace HotelManagement.Controllers
         private readonly IHotelRepository _hotelRepository;
         private readonly IBookingRepository _bookingRepository;
         private readonly IRoomRepository _roomRepository;
+        private readonly IGuestRepository _guestRepository;
         private readonly ILogger<InvoiceController> _logger;
 
         public InvoiceController(
@@ -18,12 +19,14 @@ namespace HotelManagement.Controllers
             IHotelRepository hotelRepository,
             IBookingRepository bookingRepository,
             IRoomRepository roomRepository,
+            IGuestRepository guestRepository,
             ILogger<InvoiceController> logger)
         {
             _invoiceRepository = invoiceRepository;
             _hotelRepository = hotelRepository;
             _bookingRepository = bookingRepository;
             _roomRepository = roomRepository;
+            _guestRepository = guestRepository;
             _logger = logger;
         }
 
@@ -120,6 +123,8 @@ namespace HotelManagement.Controllers
                                 BookingId = targetBooking.BookingId,
                                 InvoiceId = "INV-" + targetBooking.BookingId.ToString()[..8].ToUpper(),
                                 CustomerName = targetBooking.GuestName,
+                                GuestId = targetBooking.GuestId,
+                                HotelId = targetBooking.HotelId,
                                 RoomCharge = targetBooking.TotalAmount * 0.85m,
                                 Tax = targetBooking.TotalAmount * 0.08m,
                                 AdditionalFees = targetBooking.TotalAmount * 0.07m,
@@ -127,6 +132,22 @@ namespace HotelManagement.Controllers
                                 IssueDate = DateTime.Now,
                                 Status = "UNPAID"
                             };
+                        }
+                    }
+                    else
+                    {
+                        // Cập nhật CustomerName thực tế thay vì chuỗi guest_id
+                        if (targetBooking != null)
+                        {
+                            selectedInvoice.CustomerName = targetBooking.GuestName;
+                        }
+                        else
+                        {
+                            var guest = await _guestRepository.GetByIdAsync(selectedInvoice.GuestId ?? selectedInvoice.CustomerName ?? "");
+                            if (guest != null)
+                            {
+                                selectedInvoice.CustomerName = guest.FullName;
+                            }
                         }
                     }
 
@@ -143,27 +164,77 @@ namespace HotelManagement.Controllers
                     }
 
                     var invoice = await _invoiceRepository.GetInvoiceByBookingIdAsync(parsedGuid);
-                    if (invoice == null)
+                    Booking? targetBooking = null;
+
+                    // 1. Nếu tìm thấy hóa đơn và có hotel_id, truy vấn trực tiếp khách sạn đó (Tối ưu: chỉ 1 truy vấn)
+                    if (invoice != null && !string.IsNullOrWhiteSpace(invoice.HotelId))
                     {
-                        ViewBag.ErrorMessage = "Không tìm thấy hóa đơn cho mã đặt phòng này.";
-                    }
-                    else
-                    {
-                        // Tìm thông tin booking để lấy danh sách người lưu trú
                         try
                         {
-                            foreach (var h in hotels)
+                            var hBookings = await _bookingRepository.GetByHotelAsync(invoice.HotelId);
+                            targetBooking = hBookings.FirstOrDefault(b => b.BookingId == parsedGuid);
+                        }
+                        catch { }
+                    }
+
+                    // 2. Nếu chưa tìm được booking, truy vấn song song qua danh sách khách sạn
+                    if (targetBooking == null)
+                    {
+                        try
+                        {
+                            var hotelTasks = hotels.Select(h => _bookingRepository.GetByHotelAsync(h.HotelId));
+                            var allHotelBookings = await Task.WhenAll(hotelTasks);
+                            foreach (var bList in allHotelBookings)
                             {
-                                var hBookings = await _bookingRepository.GetByHotelAsync(h.HotelId);
-                                var matched = hBookings.FirstOrDefault(b => b.BookingId == parsedGuid);
-                                if (matched != null)
-                                {
-                                    ViewBag.CurrentBooking = matched;
-                                    break;
-                                }
+                                targetBooking = bList.FirstOrDefault(b => b.BookingId == parsedGuid);
+                                if (targetBooking != null) break;
                             }
                         }
                         catch { }
+                    }
+
+                    if (targetBooking != null)
+                    {
+                        ViewBag.CurrentBooking = targetBooking;
+                    }
+
+                    // 3. Nếu chưa có hóa đơn trong CSDL nhưng tìm thấy đơn đặt phòng -> tự động sinh hóa đơn hiển thị tạm
+                    if (invoice == null && targetBooking != null)
+                    {
+                        invoice = new Invoice
+                        {
+                            BookingId = targetBooking.BookingId,
+                            InvoiceId = "INV-" + targetBooking.BookingId.ToString()[..8].ToUpper(),
+                            CustomerName = targetBooking.GuestName,
+                            GuestId = targetBooking.GuestId,
+                            HotelId = targetBooking.HotelId,
+                            RoomCharge = targetBooking.TotalAmount * 0.85m,
+                            Tax = targetBooking.TotalAmount * 0.08m,
+                            AdditionalFees = targetBooking.TotalAmount * 0.07m,
+                            TotalAmount = targetBooking.TotalAmount,
+                            IssueDate = DateTime.Now,
+                            Status = "UNPAID"
+                        };
+                    }
+                    else if (invoice != null)
+                    {
+                        // Chuẩn hóa tên khách hàng thực tế thay vì hiển thị mã guest_id
+                        if (targetBooking != null)
+                        {
+                            invoice.CustomerName = targetBooking.GuestName;
+                        }
+                        else
+                        {
+                            var guest = await _guestRepository.GetByIdAsync(invoice.GuestId ?? invoice.CustomerName ?? "");
+                            if (guest != null)
+                            {
+                                invoice.CustomerName = guest.FullName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.ErrorMessage = "Không tìm thấy hóa đơn cho mã đặt phòng này.";
                     }
 
                     return View(invoice);

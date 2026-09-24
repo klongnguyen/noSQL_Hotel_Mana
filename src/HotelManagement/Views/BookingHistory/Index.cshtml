@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Tra Cứu Lịch Sử Lưu Trú";
-    var customerId = Context.Request.Query["customerId"].ToString();
+    var customerId = (ViewBag.CustomerId as string ?? Context.Request.Query["customerId"].ToString()).Trim();
 }
 
 <div class="container-fluid px-0">
@@ -18,6 +18,15 @@
             <h2 class="h4 fw-bold text-dark mb-0">Tra Cứu Lịch Sử Lưu Trú Của Khách Hàng</h2>
         </div>
     </div>
+
+    <!-- Hiển thị thông báo lỗi nếu có -->
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger border d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <span class="text-dark">@ViewBag.ErrorMessage</span>
+        </div>
+    }
 
     <!-- Khung tra cứu lịch sử -->
     <div class="mono-card mb-4">

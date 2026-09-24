@@ -28,11 +28,16 @@ namespace HotelManagement.Repositories
 
             var issuedAt = row.GetValue<DateTimeOffset>("issued_at");
 
+            var guestId = row.GetValue<string>("guest_id");
+            var hotelId = row.GetValue<string>("hotel_id");
+
             return new Invoice
             {
                 BookingId = row.GetValue<Guid>("booking_id"),
                 InvoiceId = row.GetValue<Guid>("invoice_id").ToString(),
-                CustomerName = row.GetValue<string>("guest_id"),
+                GuestId = guestId,
+                HotelId = hotelId,
+                CustomerName = guestId,
                 RoomCharge = row.GetValue<decimal>("room_charge"),
                 Tax = row.GetValue<decimal>("tax"),
                 AdditionalFees = row.GetValue<decimal>("service_charge"),

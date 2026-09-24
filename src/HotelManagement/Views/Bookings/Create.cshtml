@@ -39,6 +39,27 @@
             text-decoration: line-through !important;
             cursor: not-allowed !important;
         }
+        .step-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #0f172a;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .room-opt-available {
+            color: #047857;
+            font-weight: 600;
+        }
+        .room-opt-disabled {
+            color: #94a3b8;
+            background-color: #f8fafc;
+        }
     </style>
 }
 
@@ -59,98 +80,158 @@
         </a>
     </div>
 
-    <div class="p-3 bg-light border rounded-3 d-flex align-items-center gap-2 mb-4">
-        <i class="bi bi-shield-check text-dark fs-5"></i>
-        <span class="small text-secondary">
-            Hệ thống tự động kiểm tra <strong>xung đột lịch lưu trú</strong> và chống đặt trùng buồng phòng theo chuẩn thời gian thực trên Astra DB.
-        </span>
-    </div>
-
     <form asp-action="Create" method="post" id="bookingForm" class="mono-card overflow-hidden">
         <div class="card-header bg-white py-3 px-4 border-bottom">
             <h6 class="fw-bold text-dark mb-0">
-                <i class="bi bi-calendar2-check text-dark me-2"></i>Thông Tin Tiếp Nhận Đặt Phòng
+                <i class="bi bi-calendar2-check text-dark me-2"></i>Quy Trình Tiếp Nhận Đặt Phòng (Date-First Flow)
             </h6>
         </div>
         <div class="card-body p-4">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger border small mb-4"></div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All" class="alert alert-danger border small mb-4"></div>
+            }
 
-            <div class="row g-3">
-                <!-- 1. Mã Khách Hàng (Datalist Autocomplete) -->
-                <div class="col-md-6">
-                    <label asp-for="GuestId" class="form-label fw-semibold small text-uppercase text-secondary">
-                        Mã Khách Hàng <span class="text-danger">*</span>
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light text-dark"><i class="bi bi-person-badge"></i></span>
-                        <input asp-for="GuestId" list="guestList" id="guestInput" class="form-control mono-form-control" 
-                               placeholder="Gõ hoặc chọn mã khách (GUEST001)..." required autocomplete="off" />
+            <div class="row g-4">
+                <!-- BƯỚC 1: KHÁCH HÀNG & CHI NHÁNH -->
+                <div class="col-12">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="step-pill">1</span>
+                        <h6 class="fw-bold text-dark mb-0 text-uppercase small tracking-wider">Thông Tin Khách Hàng & Chi Nhánh Khách Sạn</h6>
                     </div>
-                    <datalist id="guestList">
-                        @foreach (var g in guests)
-                        {
-                            <option value="@g.GuestId" data-name="@g.FullName" data-phone="@g.Phone" data-email="@g.Email" data-nationalid="@g.NationalId">
-                                @g.GuestId - @g.FullName (@g.Phone)
-                            </option>
-                        }
-                    </datalist>
-                    
-                    <div id="guestInfoBox" class="mt-2 p-2 bg-light border rounded small d-none">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-person-check text-dark me-1"></i>
-                                <strong id="guestNameText" class="text-dark"></strong>
-                                <span id="guestPhoneText" class="text-secondary ms-2"></span>
+                    <div class="row g-3">
+                        <!-- 1. Mã Khách Hàng (Datalist Autocomplete) -->
+                        <div class="col-md-6">
+                            <label asp-for="GuestId" class="form-label fw-semibold small text-secondary">
+                                Mã Khách Hàng <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-dark"><i class="bi bi-person-badge"></i></span>
+                                <input asp-for="GuestId" list="guestList" id="guestInput" class="form-control mono-form-control" 
+                                       placeholder="Gõ hoặc chọn mã khách (GUEST001)..." required autocomplete="off" />
                             </div>
-                            <span class="badge bg-dark text-white"><i class="bi bi-check2 me-1"></i>Khách hợp lệ</span>
+                            <span asp-validation-for="GuestId" class="text-danger small d-block mt-1"></span>
+                            <datalist id="guestList">
+                                @foreach (var g in guests)
+                                {
+                                    <option value="@g.GuestId" data-name="@g.FullName" data-phone="@g.Phone" data-email="@g.Email" data-nationalid="@g.NationalId">
+                                        @g.GuestId - @g.FullName (@g.Phone)
+                                    </option>
+                                }
+                            </datalist>
+                            
+                            <div id="guestInfoBox" class="mt-2 p-2 bg-light border rounded small d-none">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-person-check text-dark me-1"></i>
+                                        <strong id="guestNameText" class="text-dark"></strong>
+                                        <span id="guestPhoneText" class="text-secondary ms-2"></span>
+                                    </div>
+                                    <span class="badge bg-dark text-white"><i class="bi bi-check2 me-1"></i>Khách hợp lệ</span>
+                                </div>
+                            </div>
+                            <div id="guestErrorBox" class="mt-1 small text-danger d-none">
+                                <i class="bi bi-exclamation-triangle me-1"></i>Mã khách hàng chưa tồn tại trong cơ sở dữ liệu.
+                            </div>
+                        </div>
+
+                        <!-- 2. Chi Nhánh Khách Sạn (Datalist Autocomplete) -->
+                        <div class="col-md-6">
+                            <label asp-for="HotelId" class="form-label fw-semibold small text-secondary">
+                                Chi Nhánh Khách Sạn <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-dark"><i class="bi bi-building"></i></span>
+                                <input asp-for="HotelId" list="hotelList" id="hotelInput" class="form-control mono-form-control" 
+                                       placeholder="Gõ hoặc chọn chi nhánh (HTL001)..." required autocomplete="off" />
+                            </div>
+                            <span asp-validation-for="HotelId" class="text-danger small d-block mt-1"></span>
+                            <datalist id="hotelList">
+                                @foreach (var h in hotels)
+                                {
+                                    <option value="@h.HotelId" data-name="@h.HotelName" data-city="@h.City" data-stars="@h.StarRating" data-address="@h.Address">
+                                        @h.HotelId - @h.HotelName (@h.City)
+                                    </option>
+                                }
+                            </datalist>
+
+                            <div id="hotelInfoBox" class="mt-2 p-2 bg-light border rounded small d-none">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-geo-alt text-dark me-1"></i>
+                                        <strong id="hotelNameText" class="text-dark"></strong>
+                                        <span id="hotelCityText" class="text-secondary ms-2"></span>
+                                    </div>
+                                    <span id="hotelStarsBadge" class="badge bg-secondary text-white"></span>
+                                </div>
+                            </div>
+                            <div id="hotelErrorBox" class="mt-1 small text-danger d-none">
+                                <i class="bi bi-exclamation-triangle me-1"></i>Mã khách sạn không tồn tại trong hệ thống.
+                            </div>
                         </div>
                     </div>
-                    <div id="guestErrorBox" class="mt-1 small text-danger d-none">
-                        <i class="bi bi-exclamation-triangle me-1"></i>Mã khách hàng chưa tồn tại trong cơ sở dữ liệu.
-                    </div>
-                    <div class="form-text text-muted small">Hệ thống đề xuất tự động từ danh bạ khách hàng Astra DB</div>
                 </div>
 
-                <!-- 2. Chi Nhánh Khách Sạn (Datalist Autocomplete) -->
-                <div class="col-md-6">
-                    <label asp-for="HotelId" class="form-label fw-semibold small text-uppercase text-secondary">
-                        Chi Nhánh Khách Sạn <span class="text-danger">*</span>
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light text-dark"><i class="bi bi-building"></i></span>
-                        <input asp-for="HotelId" list="hotelList" id="hotelInput" class="form-control mono-form-control" 
-                               placeholder="Gõ hoặc chọn chi nhánh (HTL001)..." required autocomplete="off" />
-                    </div>
-                    <datalist id="hotelList">
-                        @foreach (var h in hotels)
-                        {
-                            <option value="@h.HotelId" data-name="@h.HotelName" data-city="@h.City" data-stars="@h.StarRating" data-address="@h.Address">
-                                @h.HotelId - @h.HotelName (@h.City)
-                            </option>
-                        }
-                    </datalist>
-
-                    <div id="hotelInfoBox" class="mt-2 p-2 bg-light border rounded small d-none">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-geo-alt text-dark me-1"></i>
-                                <strong id="hotelNameText" class="text-dark"></strong>
-                                <span id="hotelCityText" class="text-secondary ms-2"></span>
+                <!-- BƯỚC 2: THỜI GIAN LƯU TRÚ (CHỌN TRƯỚC ĐỂ LỌC PHÒNG TRỐNG) -->
+                <div class="col-12">
+                    <div class="p-3 bg-light border rounded-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="step-pill">2</span>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-0 text-uppercase small tracking-wider">Thời Gian Lưu Trú Dự Kiến (Chọn Ngày Trước)</h6>
+                                    <span class="text-muted small">Hệ thống sẽ tra cứu lịch sử đặt phòng của chi nhánh để phát hiện phòng nào còn trống hoặc đã có người đặt trong khoảng này.</span>
+                                </div>
                             </div>
-                            <span id="hotelStarsBadge" class="badge bg-secondary text-white"></span>
+                            <span id="stayDurationBadge" class="badge bg-dark text-white px-2 py-1">
+                                <i class="bi bi-moon-stars me-1"></i>1 đêm
+                            </span>
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-6">
+                                <label asp-for="CheckInDate" class="form-label fw-semibold small text-secondary">
+                                    Ngày Nhận Phòng (Check-in) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white text-dark"><i class="bi bi-calendar-event"></i></span>
+                                    <input asp-for="CheckInDate" id="checkInInput" type="text" 
+                                           class="form-control mono-form-control bg-white" 
+                                           value="@Model.CheckInDate.ToString("yyyy-MM-dd")" 
+                                           placeholder="Chọn ngày nhận phòng..." required />
+                                </div>
+                                <span asp-validation-for="CheckInDate" class="text-danger small d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CheckOutDate" class="form-label fw-semibold small text-secondary">
+                                    Ngày Trả Phòng (Check-out) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white text-dark"><i class="bi bi-calendar-check"></i></span>
+                                    <input asp-for="CheckOutDate" id="checkOutInput" type="text" 
+                                           class="form-control mono-form-control bg-white" 
+                                           value="@Model.CheckOutDate.ToString("yyyy-MM-dd")" 
+                                           placeholder="Chọn ngày trả phòng..." required />
+                                </div>
+                                <span asp-validation-for="CheckOutDate" class="text-danger small d-block mt-1"></span>
+                            </div>
                         </div>
                     </div>
-                    <div id="hotelErrorBox" class="mt-1 small text-danger d-none">
-                        <i class="bi bi-exclamation-triangle me-1"></i>Mã khách sạn không tồn tại trong hệ thống.
-                    </div>
-                    <div class="form-text text-muted small">Chi nhánh tiếp nhận lưu trú của tập đoàn</div>
                 </div>
 
-                <!-- 3. Số Phòng Khả Dụng (Dropdown Dynamic) -->
-                <div class="col-md-12">
-                    <label asp-for="RoomNumber" class="form-label fw-semibold small text-uppercase text-secondary">
-                        Số Buồng Phòng <span class="text-danger">*</span>
-                    </label>
+                <!-- BƯỚC 3: CHỌN BUỒNG PHÒNG KHẢ DỤNG (ĐÃ ĐƯỢC LỌC THEO NGÀY) -->
+                <div class="col-12">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center">
+                            <span class="step-pill">3</span>
+                            <h6 class="fw-bold text-dark mb-0 text-uppercase small tracking-wider">Lựa Chọn Buồng Phòng Khả Dụng</h6>
+                        </div>
+                        <span id="roomAvailabilityStats" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                            <span class="spinner-border spinner-border-sm me-1"></span> Đang nạp tình trạng phòng...
+                        </span>
+                    </div>
+
                     <div class="input-group">
                         <span class="input-group-text bg-light text-dark"><i class="bi bi-door-open"></i></span>
                         <select asp-for="RoomNumber" id="roomSelect" class="form-select mono-form-control" required>
@@ -161,35 +242,42 @@
                                         data-price="@r.PricePerNight" 
                                         data-status="@r.Status"
                                         data-capacity="@r.Capacity"
+                                        data-available="true"
                                         selected="@(r.RoomNumber == Model.RoomNumber)">
                                     Phòng @r.RoomNumber - Hạng @r.RoomType (Tối đa @r.Capacity người)
                                 </option>
                             }
                         </select>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mt-1">
-                        <div class="form-text text-muted small">
-                            Danh sách buồng phòng tự động đồng bộ theo chi nhánh được chọn
-                        </div>
-                        <div class="small">
-                            <span class="badge bg-dark text-white px-2 py-1" id="roomCapacityBadge">
-                                <i class="bi bi-people-fill me-1"></i>Sức chứa tối đa: 2 người
-                            </span>
-                        </div>
+                    <span asp-validation-for="RoomNumber" class="text-danger small d-block mt-1"></span>
+
+                    <!-- Cảnh báo nếu toàn bộ phòng kín lịch -->
+                    <div id="noAvailableRoomsAlert" class="alert alert-warning border small mt-2 d-none">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        <strong>Toàn bộ phòng đã kín lịch!</strong> Chi nhánh này hiện không còn phòng trống nào trong khoảng ngày đã chọn. Vui lòng đổi ngày lưu trú hoặc chọn chi nhánh khách sạn khác.
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="small text-muted" id="roomHelperText">
+                            <i class="bi bi-shield-check text-success me-1"></i>Các phòng đã có người đặt trong khoảng ngày bạn chọn sẽ tự động bị khóa (disabled).
+                        </span>
+                        <span class="badge bg-dark text-white px-2 py-1" id="roomCapacityBadge">
+                            <i class="bi bi-people-fill me-1"></i>Sức chứa tối đa: 2 người
+                        </span>
                     </div>
                 </div>
 
-                <!-- 4. Số Lượng Khách Lưu Trú & Thông Tin Người Ở Cùng -->
-                <div class="col-md-12">
+                <!-- BƯỚC 4: SỐ LƯỢNG KHÁCH LƯU TRÚ & NGƯỜI Ở CÙNG -->
+                <div class="col-12">
                     <div class="p-3 bg-light border rounded-3">
                         <div class="row align-items-center mb-3">
                             <div class="col-md-7">
-                                <h6 class="fw-bold text-dark mb-1">
-                                    <i class="bi bi-person-lines-fill text-dark me-2"></i>Số Lượng Khách Lưu Trú & Khai Báo Ở Cùng
-                                </h6>
-                                <p class="small text-muted mb-0">
-                                    Người thứ nhất là đại diện đặt phòng; các thành viên ở cùng chỉ cần Họ tên và CCCD/CMND (không cần đăng ký tài khoản).
-                                </p>
+                                <div class="d-flex align-items-center">
+                                    <span class="step-pill">4</span>
+                                    <h6 class="fw-bold text-dark mb-0 text-uppercase small tracking-wider">
+                                        Số Lượng Khách Lưu Trú & Khai Báo Ở Cùng
+                                    </h6>
+                                </div>
                             </div>
                             <div class="col-md-5 text-md-end mt-2 mt-md-0">
                                 <div class="d-inline-flex align-items-center gap-2">
@@ -204,6 +292,8 @@
                             </div>
                         </div>
 
+                        <span asp-validation-for="NumberOfOccupants" class="text-danger small d-block mb-2"></span>
+
                         <!-- Danh sách chi tiết người ở cùng phòng -->
                         <div id="occupantsContainer" class="d-flex flex-column gap-2">
                             <!-- Sẽ được JavaScript tự động tạo các dòng nhập -->
@@ -213,35 +303,6 @@
                             <i class="bi bi-exclamation-triangle-fill me-1"></i>Vui lòng nhập đầy đủ Họ và tên và CCCD/CMND cho tất cả người ở cùng phòng.
                         </div>
                     </div>
-                </div>
-
-                <!-- 4. Bộ Chọn Ngày Check-in & Check-out -->
-                <div class="col-md-6">
-                    <label asp-for="CheckInDate" class="form-label fw-semibold small text-uppercase text-secondary">
-                        Ngày Nhận Phòng (Check-in) <span class="text-danger">*</span>
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light text-dark"><i class="bi bi-calendar-event"></i></span>
-                        <input asp-for="CheckInDate" id="checkInInput" type="text" 
-                               class="form-control mono-form-control bg-white" 
-                               value="@Model.CheckInDate.ToString("yyyy-MM-dd")" 
-                               placeholder="Chọn ngày nhận phòng..." required />
-                    </div>
-                    <div class="form-text text-muted small">Giờ nhận phòng tiêu chuẩn từ 14:00</div>
-                </div>
-
-                <div class="col-md-6">
-                    <label asp-for="CheckOutDate" class="form-label fw-semibold small text-uppercase text-secondary">
-                        Ngày Trả Phòng (Check-out) <span class="text-danger">*</span>
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light text-dark"><i class="bi bi-calendar-check"></i></span>
-                        <input asp-for="CheckOutDate" id="checkOutInput" type="text" 
-                               class="form-control mono-form-control bg-white" 
-                               value="@Model.CheckOutDate.ToString("yyyy-MM-dd")" 
-                               placeholder="Chọn ngày trả phòng..." required />
-                    </div>
-                    <div class="form-text text-muted small">Giờ trả phòng tiêu chuẩn trước 12:00 trưa</div>
                 </div>
             </div>
 
@@ -256,11 +317,11 @@
                 </div>
             </div>
 
-            <!-- Bảng Lịch Trình Buồng Phòng (Visual Schedule Table) -->
+            <!-- Bảng Lịch Trình Buồng Phòng Được Chọn (Visual Schedule Table) -->
             <div class="mt-4 pt-3 border-top">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="fw-bold text-dark mb-0">
-                        <i class="bi bi-clock-history me-2"></i>Lịch Đã Đặt Của Buồng Phòng Này
+                        <i class="bi bi-clock-history me-2"></i>Lịch Đã Đặt Của Buồng Phòng Được Chọn
                     </h6>
                     <span id="roomScheduleBadge" class="badge bg-dark text-white">
                         <span class="spinner-border spinner-border-sm me-1"></span> Đang tải...
@@ -285,9 +346,6 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
-                <div class="form-text text-muted small mt-1">
-                    <i class="bi bi-info-circle me-1"></i>Trên bộ lịch, những ngày thuộc các đợt lưu trú trên sẽ bị <strong>làm mờ và vô hiệu hóa</strong>. Đơn đặt phòng bắt buộc phải là chuỗi ngày trống liên tục.
                 </div>
             </div>
 
@@ -343,6 +401,10 @@
             const roomSelect = document.getElementById("roomSelect");
             const checkInInput = document.getElementById("checkInInput");
             const checkOutInput = document.getElementById("checkOutInput");
+            const stayDurationBadge = document.getElementById("stayDurationBadge");
+            const roomAvailabilityStats = document.getElementById("roomAvailabilityStats");
+            const noAvailableRoomsAlert = document.getElementById("noAvailableRoomsAlert");
+
             const conflictAlert = document.getElementById("conflictAlert");
             const conflictMessage = document.getElementById("conflictMessage");
             const submitBtn = document.getElementById("submitBookingBtn");
@@ -435,8 +497,8 @@
                     hotelStarsBadge.textContent = (found.getAttribute("data-stars") || "5") + " ⭐";
                     hotelInfoBox.classList.remove("d-none");
                     hotelErrorBox.classList.add("d-none");
-                    // Nạp danh sách phòng tương ứng với khách sạn này
-                    loadRoomsForHotel(val);
+                    // Nạp danh sách phòng tương ứng với chi nhánh và ngày đã chọn
+                    loadRoomsForHotelAndDates();
                 } else if (val.length > 0) {
                     hotelInfoBox.classList.add("d-none");
                     hotelErrorBox.classList.remove("d-none");
@@ -449,41 +511,100 @@
             hotelInput.addEventListener("input", updateHotelInfo);
             hotelInput.addEventListener("change", updateHotelInfo);
 
-            // 4. Nạp danh sách phòng qua AJAX khi đổi khách sạn
-            async function loadRoomsForHotel(hotelId) {
+            // 4. LẤY PHÒNG THEO KHÁCH SẠN VÀ DẢI NGÀY ĐÃ CHỌN (DATE-FIRST LOGIC)
+            async function loadRoomsForHotelAndDates() {
+                const hotelId = (hotelInput.value || "").trim();
+                const checkIn = checkInInput.value;
+                const checkOut = checkOutInput.value;
+
+                if (!hotelId) return;
+
+                roomAvailabilityStats.className = "badge bg-secondary text-white";
+                roomAvailabilityStats.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Đang lọc phòng...`;
+
                 try {
-                    const response = await fetch(`/Bookings/GetRooms?hotelId=${encodeURIComponent(hotelId)}`);
+                    let url = `/Bookings/GetRooms?hotelId=${encodeURIComponent(hotelId)}`;
+                    if (checkIn && checkOut) {
+                        url += `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`;
+                    }
+
+                    const response = await fetch(url);
                     if (!response.ok) return;
                     const rooms = await response.json();
-                    
+
                     const currentSelectedRoom = roomSelect.value;
                     roomSelect.innerHTML = "";
 
                     if (rooms.length === 0) {
                         const opt = document.createElement("option");
                         opt.value = "";
-                        opt.textContent = "-- Không có phòng khả dụng tại cơ sở này --";
+                        opt.textContent = "-- Không có phòng nào tại chi nhánh này --";
                         roomSelect.appendChild(opt);
-                    } else {
-                        rooms.forEach(r => {
-                            const opt = document.createElement("option");
-                            opt.value = r.roomNumber;
-                            opt.setAttribute("data-type", r.roomType);
-                            opt.setAttribute("data-price", r.pricePerNight);
-                            opt.setAttribute("data-status", r.status);
-                            opt.setAttribute("data-capacity", r.capacity || 2);
-                            opt.textContent = `Phòng ${r.roomNumber} - Hạng ${r.roomType} (Tối đa ${r.capacity || 2} người)`;
+                        roomAvailabilityStats.className = "badge bg-danger text-white";
+                        roomAvailabilityStats.textContent = "0 phòng khả dụng";
+                        noAvailableRoomsAlert.classList.remove("d-none");
+                        submitBtn.disabled = true;
+                        return;
+                    }
+
+                    let availableCount = 0;
+                    let firstAvailableRoom = null;
+
+                    rooms.forEach(r => {
+                        const opt = document.createElement("option");
+                        opt.value = r.roomNumber;
+                        opt.setAttribute("data-type", r.roomType);
+                        opt.setAttribute("data-price", r.pricePerNight);
+                        opt.setAttribute("data-status", r.status);
+                        opt.setAttribute("data-capacity", r.capacity || 2);
+                        opt.setAttribute("data-available", r.isAvailable ? "true" : "false");
+
+                        if (r.isAvailable) {
+                            availableCount++;
+                            opt.textContent = `Phòng ${r.roomNumber} - Hạng ${r.roomType} (${formatVND(r.pricePerNight)}/đêm)`;
+                            opt.className = "room-opt-available";
+                            if (!firstAvailableRoom) firstAvailableRoom = r.roomNumber.toString();
                             if (r.roomNumber.toString() === currentSelectedRoom) {
                                 opt.selected = true;
                             }
-                            roomSelect.appendChild(opt);
-                        });
+                        } else {
+                            opt.disabled = true;
+                            opt.className = "room-opt-disabled";
+                            const reason = r.conflictReason ? `[${r.conflictReason}]` : `[Đã có người đặt]`;
+                            opt.textContent = `Phòng ${r.roomNumber} - Hạng ${r.roomType} ${reason}`;
+                        }
+
+                        roomSelect.appendChild(opt);
+                    });
+
+                    // Nếu phòng đang chọn bị disabled hoặc chưa chọn, tự động chuyển sang phòng trống đầu tiên
+                    const selectedOpt = roomSelect.options[roomSelect.selectedIndex];
+                    if (!selectedOpt || selectedOpt.disabled) {
+                        if (firstAvailableRoom) {
+                            roomSelect.value = firstAvailableRoom;
+                        }
                     }
 
-                    // Tải lịch đặt phòng cho phòng đang chọn
+                    // Cập nhật thống kê phòng trống
+                    if (availableCount > 0) {
+                        roomAvailabilityStats.className = "badge bg-success-subtle text-success border border-success-subtle px-2 py-1";
+                        roomAvailabilityStats.innerHTML = `<i class="bi bi-check-circle me-1"></i>${availableCount}/${rooms.length} phòng còn trống trong kỳ lưu trú`;
+                        noAvailableRoomsAlert.classList.add("d-none");
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove("opacity-50");
+                    } else {
+                        roomAvailabilityStats.className = "badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1";
+                        roomAvailabilityStats.innerHTML = `<i class="bi bi-x-circle me-1"></i>0/${rooms.length} phòng trống (Đã kín lịch)`;
+                        noAvailableRoomsAlert.classList.remove("d-none");
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add("opacity-50");
+                    }
+
                     onRoomChanged();
                 } catch (e) {
-                    console.error("Lỗi nạp phòng:", e);
+                    console.error("Lỗi nạp phòng theo ngày:", e);
+                    roomAvailabilityStats.className = "badge bg-danger text-white";
+                    roomAvailabilityStats.textContent = "Lỗi nạp phòng";
                 }
             }
 
@@ -556,7 +677,6 @@
                     card.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="badge bg-secondary text-white"><i class="bi bi-person me-1"></i>Người ở cùng #${i + 1}</span>
-                            <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>Khai báo lưu trú</span>
                         </div>
                         <input type="hidden" name="Occupants[${i}].IsPrimary" value="false" />
                         <div class="row g-2">
@@ -568,7 +688,9 @@
                             <div class="col-md-4">
                                 <label class="form-label small fw-semibold text-secondary mb-1">Số CCCD / CMND <span class="text-danger">*</span></label>
                                 <input type="text" name="Occupants[${i}].CitizenId" id="occ_cid_${i}" value="${rowData.citizenId}" 
-                                       class="form-control form-control-sm mono-form-control font-monospace" placeholder="12 chữ số..." required />
+                                       class="form-control form-control-sm mono-form-control font-monospace" 
+                                       placeholder="12 chữ số CCCD..." pattern="\\d{12}" maxlength="12" minlength="12" 
+                                       title="Số CCCD phải gồm đúng 12 chữ số" required />
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label small fw-semibold text-secondary mb-1">Ngày sinh</label>
@@ -587,19 +709,22 @@
 
             occupantCountSelect.addEventListener("change", renderOccupants);
 
-            // 6. Khi chọn phòng khác: lấy danh sách lịch đã book & cập nhật Flatpickr + Sức chứa
+            // 6. Khi chọn buồng phòng: Cập nhật giá, sức chứa & Bảng lịch đặt chi tiết của phòng đó
             async function onRoomChanged() {
                 const hotelId = (hotelInput.value || "").trim();
                 const roomNumber = roomSelect.value;
                 updatePriceCalculation();
 
                 const selectedOption = roomSelect.options[roomSelect.selectedIndex];
-                const capacity = selectedOption ? parseInt(selectedOption.getAttribute("data-capacity") || "2", 10) : 2;
+                if (!selectedOption || selectedOption.disabled) {
+                    return;
+                }
+
+                const capacity = parseInt(selectedOption.getAttribute("data-capacity") || "2", 10);
                 updateOccupantCountOptions(capacity);
 
                 if (!hotelId || !roomNumber) {
                     currentBookedRanges = [];
-                    initFlatpickr([]);
                     return;
                 }
 
@@ -611,7 +736,7 @@
                     if (!response.ok) throw new Error("Lỗi API");
                     const bookings = await response.json();
 
-                    // Render bảng lịch trình
+                    // Render bảng lịch trình buồng phòng
                     roomScheduleBody.innerHTML = "";
                     currentBookedRanges = [];
 
@@ -653,8 +778,6 @@
                         });
                     }
 
-                    // Cập nhật bộ lịch Flatpickr với các dải ngày bị vô hiệu hóa (disabled)
-                    initFlatpickr(currentBookedRanges);
                     validateDatesContinuity();
                 } catch (e) {
                     console.error("Lỗi tải lịch buồng phòng:", e);
@@ -665,17 +788,8 @@
 
             roomSelect.addEventListener("change", onRoomChanged);
 
-            // 7. Khởi tạo Flatpickr với tính năng làm mờ ngày bận & chỉ cho chọn ngày sáng
-            function initFlatpickr(bookedRanges) {
-                const disabledConfig = bookedRanges.map(r => {
-                    const dEnd = new Date(r.to);
-                    dEnd.setDate(dEnd.getDate() - 1);
-                    return {
-                        from: r.from,
-                        to: dEnd.toISOString().split('T')[0]
-                    };
-                });
-
+            // 7. Khởi tạo Flatpickr cho bộ chọn Check-in & Check-out
+            function initFlatpickr() {
                 if (fpCheckIn) fpCheckIn.destroy();
                 if (fpCheckOut) fpCheckOut.destroy();
 
@@ -683,7 +797,6 @@
                     locale: "vn",
                     dateFormat: "Y-m-d",
                     minDate: "today",
-                    disable: disabledConfig,
                     onChange: function (selectedDates, dateStr) {
                         if (selectedDates.length > 0) {
                             const minCheckOut = new Date(selectedDates[0]);
@@ -694,8 +807,8 @@
                                 fpCheckOut.setDate(minCheckOut);
                             }
                         }
-                        validateDatesContinuity();
-                        updatePriceCalculation();
+                        // Khi đổi ngày: tự động lọc lại các phòng khả dụng cho kỳ lưu trú này
+                        loadRoomsForHotelAndDates();
                     }
                 });
 
@@ -704,13 +817,13 @@
                     dateFormat: "Y-m-d",
                     minDate: new Date().fp_incr(1),
                     onChange: function () {
-                        validateDatesContinuity();
-                        updatePriceCalculation();
+                        // Khi đổi ngày trả phòng: lọc lại phòng khả dụng
+                        loadRoomsForHotelAndDates();
                     }
                 });
             }
 
-            // 8. Kiểm tra tính liên tục của ngày đặt (Không bị gián đoạn bởi đơn đặt giữa chừng)
+            // 8. Kiểm tra tính liên tục của ngày đặt và xung đột lịch
             function validateDatesContinuity() {
                 const inStr = checkInInput.value;
                 const outStr = checkOutInput.value;
@@ -742,7 +855,7 @@
                 if (conflict) {
                     const fromFormatted = new Date(conflict.from).toLocaleDateString('vi-VN');
                     const toFormatted = new Date(conflict.to).toLocaleDateString('vi-VN');
-                    showConflict(`Khoảng thời gian bạn chọn không liên tục vì đã có khách (${conflict.guestName || 'đã đặt'}) giữ phòng từ ngày ${fromFormatted} đến ${toFormatted} (Mã: ${conflict.bookingId.substring(0, 8)}...). Vui lòng chọn dải ngày trống liên tục!`);
+                    showConflict(`Phòng này đã có khách (${conflict.guestName || 'đã đặt'}) giữ phòng từ ngày ${fromFormatted} đến ${toFormatted} (Mã: ${conflict.bookingId.substring(0, 8)}...). Vui lòng chọn buồng phòng còn trống khác!`);
                     return false;
                 }
 
@@ -759,8 +872,11 @@
 
             function hideConflict() {
                 conflictAlert.classList.add("d-none");
-                submitBtn.disabled = false;
-                submitBtn.classList.remove("opacity-50");
+                const selectedOpt = roomSelect.options[roomSelect.selectedIndex];
+                if (selectedOpt && !selectedOpt.disabled) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove("opacity-50");
+                }
             }
 
             // 9. Tự động tính tiền theo giá phòng & số đêm
@@ -779,20 +895,30 @@
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                     if (diffDays > 0) {
+                        stayDurationBadge.innerHTML = `<i class="bi bi-moon-stars me-1"></i>${diffDays} đêm`;
                         nightsCountText.textContent = `${diffDays} đêm`;
                         totalAmountText.textContent = formatVND(pricePerNight * diffDays);
                     } else {
+                        stayDurationBadge.innerHTML = `<i class="bi bi-moon-stars me-1"></i>0 đêm`;
                         nightsCountText.textContent = `0 đêm`;
                         totalAmountText.textContent = `0 ₫`;
                     }
                 } else {
+                    stayDurationBadge.innerHTML = `<i class="bi bi-moon-stars me-1"></i>1 đêm`;
                     nightsCountText.textContent = `1 đêm`;
                     totalAmountText.textContent = formatVND(pricePerNight);
                 }
             }
 
-            // 10. Chặn submit nếu thiếu thông tin người ở cùng hoặc xung đột ngày
+            // 10. Chặn submit nếu thiếu thông tin hoặc chọn phòng không hợp lệ
             document.getElementById("bookingForm").addEventListener("submit", function (e) {
+                const selectedOpt = roomSelect.options[roomSelect.selectedIndex];
+                if (!selectedOpt || selectedOpt.disabled) {
+                    e.preventDefault();
+                    alert("Buồng phòng bạn chọn hiện không khả dụng (đã có khách đặt hoặc đang bảo trì). Vui lòng chọn buồng phòng còn trống!");
+                    return false;
+                }
+
                 if (!validateDatesContinuity()) {
                     e.preventDefault();
                     return false;
@@ -817,16 +943,38 @@
                         occupantsErrorAlert.classList.remove("d-none");
                         return false;
                     }
+
+                    // Kiểm tra định dạng CCCD 12 số của người ở cùng
+                    const ccdRegex = /^\d{12}$/;
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    for (let i = 1; i < count; i++) {
+                        const cid = document.getElementById(`occ_cid_${i}`);
+                        const dob = document.getElementById(`occ_dob_${i}`);
+                        if (cid && !ccdRegex.test(cid.value.trim())) {
+                            e.preventDefault();
+                            alert(`Số CCCD của người ở cùng #${i + 1} không hợp lệ! Bắt buộc phải gồm đúng 12 chữ số.`);
+                            cid.focus();
+                            return false;
+                        }
+                        if (dob && dob.value) {
+                            if (dob.value > todayStr) {
+                                e.preventDefault();
+                                alert(`Ngày sinh của người ở cùng #${i + 1} không được lớn hơn ngày hiện tại!`);
+                                dob.focus();
+                                return false;
+                            }
+                        }
+                    }
                 }
 
                 occupantsErrorAlert.classList.add("d-none");
                 return true;
             });
 
-            // Khởi động nạp thông tin lần đầu
+            // Khởi động khởi tạo các bộ chọn
+            initFlatpickr();
             updateGuestInfo();
             updateHotelInfo();
-            onRoomChanged();
         });
     </script>
 }

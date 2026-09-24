@@ -155,25 +155,7 @@ public class BookingRepository : IBookingRepository
             WHERE hotel_id = ? AND check_in_date = ? AND booking_id = ?;
             """);
 
-        var updateRoom = await _context.Session.PrepareAsync("""
-            UPDATE rooms_by_hotel
-            SET status = ?
-            WHERE hotel_id = ? AND room_number = ?;
-            """);
-
-        var deleteOccupiedRoomStatus = await _context.Session.PrepareAsync("""
-            DELETE FROM rooms_by_hotel_status
-            WHERE hotel_id = ? AND status = ? AND room_number = ?;
-            """);
-
-        var insertAvailableRoomStatus = await _context.Session.PrepareAsync("""
-            INSERT INTO rooms_by_hotel_status
-            (hotel_id, status, room_number, room_type, price_per_night, capacity)
-            VALUES (?, ?, ?, ?, ?, ?);
-            """);
-
         // Hủy booking: cập nhật CANCELLED ở cả hai bảng denormalized
-        // và hoàn trả phòng về AVAILABLE.
         var batch = new BatchStatement()
             .SetBatchType(BatchType.Logged)
             .Add(updateByGuest.Bind(
@@ -185,22 +167,46 @@ public class BookingRepository : IBookingRepository
                 "CANCELLED",
                 booking.HotelId,
                 checkIn,
-                booking.BookingId))
-            .Add(updateRoom.Bind(
-                "AVAILABLE",
-                booking.HotelId,
-                booking.RoomNumber))
-            .Add(deleteOccupiedRoomStatus.Bind(
-                booking.HotelId,
-                "OCCUPIED",
-                booking.RoomNumber))
-            .Add(insertAvailableRoomStatus.Bind(
-                booking.HotelId,
-                "AVAILABLE",
-                booking.RoomNumber,
-                room.RoomType,
-                room.PricePerNight,
-                room.Capacity));
+                booking.BookingId));
+
+        // Chỉ hoàn trả phòng về AVAILABLE nếu đơn bị hủy là đơn đang diễn ra ngay hôm nay
+        // Tránh ghi đè trạng thái phòng nếu đơn bị hủy là đơn đặt trước trong tương lai hoặc phòng đang bảo trì
+        bool isOccupiedToday = booking.CheckInDate.Date <= DateTime.Today && booking.CheckOutDate.Date > DateTime.Today;
+        if (isOccupiedToday && !room.Status.Equals("MAINTENANCE", StringComparison.OrdinalIgnoreCase))
+        {
+            var updateRoom = await _context.Session.PrepareAsync("""
+                UPDATE rooms_by_hotel
+                SET status = ?
+                WHERE hotel_id = ? AND room_number = ?;
+                """);
+
+            var deleteOccupiedRoomStatus = await _context.Session.PrepareAsync("""
+                DELETE FROM rooms_by_hotel_status
+                WHERE hotel_id = ? AND status = ? AND room_number = ?;
+                """);
+
+            var insertAvailableRoomStatus = await _context.Session.PrepareAsync("""
+                INSERT INTO rooms_by_hotel_status
+                (hotel_id, status, room_number, room_type, price_per_night, capacity)
+                VALUES (?, ?, ?, ?, ?, ?);
+                """);
+
+            batch.Add(updateRoom.Bind(
+                    "AVAILABLE",
+                    booking.HotelId,
+                    booking.RoomNumber))
+                .Add(deleteOccupiedRoomStatus.Bind(
+                    booking.HotelId,
+                    "OCCUPIED",
+                    booking.RoomNumber))
+                .Add(insertAvailableRoomStatus.Bind(
+                    booking.HotelId,
+                    "AVAILABLE",
+                    booking.RoomNumber,
+                    room.RoomType,
+                    room.PricePerNight,
+                    room.Capacity));
+        }
 
         await _context.Session.ExecuteAsync(batch);
     }

@@ -1,0 +1,401 @@
+[
+  {
+    "id": "TC01",
+    "module": "Dashboard & Home",
+    "description": "Truy cập trang chủ Dashboard (HTTP 200)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC02",
+    "module": "Dashboard & Home",
+    "description": "Hiển thị đầy đủ 4 thẻ chỉ số KPI cốt lõi",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC03",
+    "module": "Dashboard & Home",
+    "description": "Biểu đồ phân tích doanh thu và xếp hạng chi nhánh",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC04",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Danh sách khách sạn tải thành công với dữ liệu",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC05",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Lọc khách sạn theo thành phố (Query-First hotels_by_city)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC06",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Lọc khách sạn theo thành phố không tồn tại (Empty State)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC07",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Lọc khách sạn theo tiêu chuẩn hạng sao (5 sao)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC08",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Tìm kiếm khách sạn theo từ khóa tên",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC09",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Xem chi tiết khách sạn hợp lệ (HTL001)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC10",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Xem chi tiết khách sạn không tồn tại -> HotelNotFound View",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC11",
+    "module": "Quản Lý Khách Sạn",
+    "description": "Truy cập /Hotels/Details không có ID -> Redirect an toàn",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC12",
+    "module": "Quản Lý Buồng Phòng",
+    "description": "Danh sách phòng nghỉ mặc định khách sạn đầu tiên (200 OK)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC13",
+    "module": "Quản Lý Buồng Phòng",
+    "description": "Xem danh sách phòng của khách sạn cụ thể (HTL002)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC14",
+    "module": "Quản Lý Buồng Phòng",
+    "description": "Lọc phòng AVAILABLE (rooms_by_hotel_status)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC15",
+    "module": "Quản Lý Buồng Phòng",
+    "description": "Lọc phòng OCCUPIED (rooms_by_hotel_status)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC16",
+    "module": "Quản Lý Buồng Phòng",
+    "description": "Xem phòng khách sạn không có phòng -> Empty State",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC17",
+    "module": "Quản Lý Buồng Phòng",
+    "description": "Kiểm tra cấu trúc Colspan bảng phòng",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC18",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Tải danh sách hồ sơ khách hàng (200 OK)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC19",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Tìm kiếm khách hàng theo chính xác mã Partition Key (GUEST001)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC20",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Tìm kiếm đa năng khách hàng theo Họ tên",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC21",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Tìm kiếm khách hàng không tồn tại -> Empty State",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC22",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Chi tiết khách hàng GUEST001",
+    "status": "FAIL",
+    "details": "Status: 404"
+  },
+  {
+    "id": "TC23",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Xem chi tiết khách hàng không tồn tại -> 404 NotFound",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC24",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Validate tạo khách hàng: Bỏ trống GuestId -> Bị chặn",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC25",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Validate trùng mã khách hàng",
+    "status": "FAIL",
+    "details": "Không báo lỗi trùng mã khách hàng"
+  },
+  {
+    "id": "TC26",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Tạo khách hàng mới thành công (GTEST_75332)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC27",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Cập nhật khách hàng: Sai khớp ID giữa Route và Body -> 400 BadRequest",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC28",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Cập nhật thông tin khách hàng thành công",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC29",
+    "module": "Hồ Sơ Khách Hàng",
+    "description": "Xóa hồ sơ khách hàng thử nghiệm (GTEST_75332)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC30",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Trang quản lý đơn đặt phòng khi chưa nhập GuestId (Prompt)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC31",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Tra cứu danh sách đặt phòng theo GuestId (GUEST001)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC32",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "API AJAX GetRooms trả về danh sách phòng kèm giá và sức chứa",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC33",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "API AJAX GetBookedDates trả về danh sách lịch đã đặt",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC34",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Validate đặt phòng: Ngày check-in trong quá khứ -> Bị từ chối và hiển thị lỗi",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC35",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Validate đặt phòng: Check-out cùng ngày check-in -> Bị từ chối và hiển thị lỗi",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC36",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Validate đặt phòng: Khách hàng không tồn tại -> Báo lỗi",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC37",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Validate đặt phòng: Khách sạn không tồn tại -> Báo lỗi",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC38",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Validate đặt phòng: Vượt quá sức chứa phòng (Capacity Exceeded) -> Báo lỗi",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC39",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Validate đặt phòng: Thiếu thông tin người ở cùng thứ 2 -> Báo lỗi",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC40",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Tạo đơn đặt phòng hợp lệ thành công (Booking: 8a569e8e-9f13-4e65-a345-38e35a962b8e)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC41",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Phát hiện xung đột lịch đặt phòng (Overlap Detection) -> Bị chặn và hiển thị cảnh báo",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC42",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Hủy đơn đặt phòng thành công (8a569e8e-9f13-4e65-a345-38e35a962b8e)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC43",
+    "module": "Đặt Phòng (Bookings)",
+    "description": "Hủy đơn đã hủy trước đó -> Bị từ chối và cảnh báo",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC44",
+    "module": "Lịch Sử Lưu Trú (BookingHistory)",
+    "description": "Trang lịch sử khi chưa nhập mã (Prompt)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC45",
+    "module": "Lịch Sử Lưu Trú (BookingHistory)",
+    "description": "Tra cứu lịch sử khách hàng có dữ liệu (GUEST001)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC46",
+    "module": "Lịch Sử Lưu Trú (BookingHistory)",
+    "description": "Tra cứu lịch sử khách không tồn tại -> Empty State",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC47",
+    "module": "Lịch Sử Lưu Trú (BookingHistory)",
+    "description": "Tra cứu lịch sử khi mã có khoảng trắng (' GUEST001 ')",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC48",
+    "module": "Lịch Sử Lưu Trú (BookingHistory)",
+    "description": "An toàn trước injection payload (' OR 1=1 --) trong BookingHistory",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC49",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Trang hóa đơn mặc định khi chưa tra cứu (200 OK)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC50",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Tra cứu hóa đơn theo [Khách Sạn + Số Phòng] (HTL001, P.101)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC51",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Tra cứu hóa đơn phòng không có booking -> Báo lỗi lịch sự",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC52",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Tra cứu hóa đơn theo mã GUID đặt phòng (Seed Data)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC53",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Kiểm tra tên khách hàng trên hóa đơn",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC54",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Tra cứu GUID không tồn tại -> Thông báo không tìm thấy",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC55",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Tra cứu mã không phải GUID -> Bắt lỗi định dạng",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC56",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Liên kết Lịch sử -> Xem hóa đơn chi tiết đơn có sẵn (e58cccdd-ef47-5e15-8f54-afe3fc8fa3cc)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "id": "TC57",
+    "module": "Hóa Đơn & Thu Ngân (Invoice)",
+    "description": "Liên kết Lịch sử -> Xem hóa đơn đơn mới tạo (8a569e8e-9f13-4e65-a345-38e35a962b8e)",
+    "status": "PASS",
+    "details": ""
+  }
+]

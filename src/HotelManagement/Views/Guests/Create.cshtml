@@ -25,30 +25,46 @@
             <h6 class="fw-bold text-dark mb-0"><i class="bi bi-person-plus text-dark me-2"></i>Thông Tin Định Danh Khách Hàng</h6>
         </div>
         <div class="card-body p-4">
-            <div asp-validation-summary="ModelOnly" class="alert alert-secondary border small mb-4"></div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All" class="alert alert-danger border small mb-4"></div>
+            }
 
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label asp-for="GuestId" class="form-label fw-semibold small text-uppercase text-secondary">Mã Khách Hàng</label>
-                    <input asp-for="GuestId" class="form-control mono-form-control" placeholder="Ví dụ: GUEST036" required />
-                    <span asp-validation-for="GuestId" class="text-danger small"></span>
+                    <label asp-for="GuestId" class="form-label fw-semibold small text-uppercase text-secondary">
+                        Mã Khách Hàng <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="GuestId" class="form-control mono-form-control" placeholder="Ví dụ: GUEST036" required minlength="3" maxlength="20" />
+                    <span asp-validation-for="GuestId" class="text-danger small d-block mt-1"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="FullName" class="form-label fw-semibold small text-uppercase text-secondary">Họ Và Tên</label>
-                    <input asp-for="FullName" class="form-control mono-form-control" placeholder="Nguyễn Văn A" required />
-                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                    <label asp-for="FullName" class="form-label fw-semibold small text-uppercase text-secondary">
+                        Họ Và Tên <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="FullName" class="form-control mono-form-control" placeholder="Nguyễn Văn A" required minlength="2" maxlength="100" />
+                    <span asp-validation-for="FullName" class="text-danger small d-block mt-1"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Phone" class="form-label fw-semibold small text-uppercase text-secondary">Số Điện Thoại</label>
-                    <input asp-for="Phone" class="form-control mono-form-control" placeholder="0901234567" />
+                    <label asp-for="Phone" class="form-label fw-semibold small text-uppercase text-secondary">
+                        Số Điện Thoại <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="Phone" class="form-control mono-form-control font-monospace" placeholder="0901234567" required pattern="0\d{9}" maxlength="10" title="Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0" />
+                    <span asp-validation-for="Phone" class="text-danger small d-block mt-1"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Email" class="form-label fw-semibold small text-uppercase text-secondary">Địa Chỉ Email</label>
-                    <input asp-for="Email" type="email" class="form-control mono-form-control" placeholder="example@gmail.com" />
+                    <label asp-for="Email" class="form-label fw-semibold small text-uppercase text-secondary">
+                        Địa Chỉ Email <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="Email" type="email" class="form-control mono-form-control" placeholder="example@gmail.com" required />
+                    <span asp-validation-for="Email" class="text-danger small d-block mt-1"></span>
                 </div>
                 <div class="col-12">
-                    <label asp-for="NationalId" class="form-label fw-semibold small text-uppercase text-secondary">Số CCCD / CMND / Hộ Chiếu</label>
-                    <input asp-for="NationalId" class="form-control mono-form-control" placeholder="079200000001" />
+                    <label asp-for="NationalId" class="form-label fw-semibold small text-uppercase text-secondary">
+                        Số Căn Cước Công Dân (CCCD 12 Chữ Số) <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="NationalId" class="form-control mono-form-control font-monospace" placeholder="079200000001" required pattern="\d{12}" maxlength="12" minlength="12" title="Căn cước công dân phải gồm đúng 12 chữ số" />
+                    <span asp-validation-for="NationalId" class="text-danger small d-block mt-1"></span>
                 </div>
             </div>
         </div>

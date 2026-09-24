@@ -8,6 +8,10 @@ namespace HotelManagement.Models
         public string? InvoiceId { get; set; }
         
         public string? CustomerName { get; set; }
+
+        public string? GuestId { get; set; }
+
+        public string? HotelId { get; set; }
         
         // Các khoản phí theo đúng yêu cầu từ Jira (STORY-302)
         public decimal RoomCharge { get; set; } // Tiền phòng

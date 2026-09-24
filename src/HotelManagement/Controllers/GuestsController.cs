@@ -61,8 +61,7 @@ public class GuestsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Guest guest)
     {
-        if (string.IsNullOrWhiteSpace(guest.GuestId))
-            ModelState.AddModelError(nameof(guest.GuestId), "Mã khách hàng không được để trống.");
+        ValidateGuest(guest);
 
         if (!ModelState.IsValid) return View(guest);
 
@@ -107,6 +106,8 @@ public class GuestsController : Controller
         if (!string.Equals(id, guest.GuestId, StringComparison.OrdinalIgnoreCase))
             return BadRequest();
 
+        ValidateGuest(guest);
+
         if (!ModelState.IsValid)
             return View(guest);
 
@@ -125,6 +126,60 @@ public class GuestsController : Controller
             _logger.LogError(ex, "Lỗi khi cập nhật khách hàng {GuestId}", id);
             ModelState.AddModelError("", "Không thể cập nhật khách hàng.");
             return View(guest);
+        }
+    }
+
+    private void ValidateGuest(Guest guest)
+    {
+        guest.GuestId = guest.GuestId?.Trim() ?? string.Empty;
+        guest.FullName = guest.FullName?.Trim() ?? string.Empty;
+        guest.Phone = guest.Phone?.Trim() ?? string.Empty;
+        guest.Email = guest.Email?.Trim() ?? string.Empty;
+        guest.NationalId = guest.NationalId?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(guest.GuestId))
+        {
+            ModelState.AddModelError(nameof(guest.GuestId), "Mã khách hàng không được để trống.");
+        }
+        else if (guest.GuestId.Length < 3 || guest.GuestId.Length > 20)
+        {
+            ModelState.AddModelError(nameof(guest.GuestId), "Mã khách hàng phải từ 3 đến 20 ký tự.");
+        }
+
+        if (string.IsNullOrWhiteSpace(guest.FullName))
+        {
+            ModelState.AddModelError(nameof(guest.FullName), "Họ và tên khách hàng không được để trống.");
+        }
+        else if (guest.FullName.Length < 2 || guest.FullName.Length > 100)
+        {
+            ModelState.AddModelError(nameof(guest.FullName), "Họ và tên phải từ 2 đến 100 ký tự.");
+        }
+
+        if (string.IsNullOrWhiteSpace(guest.Phone))
+        {
+            ModelState.AddModelError(nameof(guest.Phone), "Số điện thoại không được để trống.");
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(guest.Phone, @"^0\d{9}$"))
+        {
+            ModelState.AddModelError(nameof(guest.Phone), "Số điện thoại không hợp lệ (phải gồm đúng 10 chữ số và bắt đầu bằng số 0).");
+        }
+
+        if (string.IsNullOrWhiteSpace(guest.Email))
+        {
+            ModelState.AddModelError(nameof(guest.Email), "Địa chỉ email không được để trống.");
+        }
+        else if (!new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(guest.Email))
+        {
+            ModelState.AddModelError(nameof(guest.Email), "Địa chỉ email không đúng định dạng.");
+        }
+
+        if (string.IsNullOrWhiteSpace(guest.NationalId))
+        {
+            ModelState.AddModelError(nameof(guest.NationalId), "Số Căn cước công dân (CCCD) không được để trống.");
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(guest.NationalId, @"^\d{12}$"))
+        {
+            ModelState.AddModelError(nameof(guest.NationalId), "Số Căn cước công dân (CCCD) phải bao gồm đúng 12 chữ số.");
         }
     }
 
