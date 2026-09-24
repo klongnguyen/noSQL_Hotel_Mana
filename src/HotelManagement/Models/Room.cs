@@ -9,6 +9,11 @@ public class Room
     public string Status { get; set; } = "AVAILABLE"; // AVAILABLE, OCCUPIED, MAINTENANCE
 
     /// <summary>
+    /// Sức chứa tối đa của phòng (Standard: 2, Deluxe: 3, Suite: 4)
+    /// </summary>
+    public int Capacity { get; set; } = 2;
+
+    /// <summary>
     /// Hiển thị giá tiền dạng chuẩn Việt Nam: ví dụ "800.000 VND"
     /// </summary>
     public string PriceFormatted => $"{PricePerNight:N0} VND";

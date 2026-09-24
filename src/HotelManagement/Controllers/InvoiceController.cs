@@ -10,17 +10,20 @@ namespace HotelManagement.Controllers
         private readonly InvoiceRepository _invoiceRepository;
         private readonly IHotelRepository _hotelRepository;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IRoomRepository _roomRepository;
         private readonly ILogger<InvoiceController> _logger;
 
         public InvoiceController(
             InvoiceRepository invoiceRepository,
             IHotelRepository hotelRepository,
             IBookingRepository bookingRepository,
+            IRoomRepository roomRepository,
             ILogger<InvoiceController> logger)
         {
             _invoiceRepository = invoiceRepository;
             _hotelRepository = hotelRepository;
             _bookingRepository = bookingRepository;
+            _roomRepository = roomRepository;
             _logger = logger;
         }
 
@@ -40,6 +43,13 @@ namespace HotelManagement.Controllers
                     : hotels.FirstOrDefault()?.HotelId ?? "HTL001";
 
                 ViewBag.SelectedHotelId = selectedHotelId;
+
+                // Nạp danh sách phòng của khách sạn được chọn cho Combobox phòng
+                var availableRooms = (await _roomRepository.GetRoomsByHotelAsync(selectedHotelId))
+                    .OrderBy(r => r.RoomNumber)
+                    .ToList();
+                ViewBag.AvailableRooms = availableRooms;
+
                 ViewBag.SelectedRoomNumber = roomNumber;
                 ViewBag.BookingId = bookingId;
 
@@ -96,11 +106,13 @@ namespace HotelManagement.Controllers
                         return View(null);
                     }
 
+                    var targetBooking = roomBookings.FirstOrDefault(b => b.BookingId == targetBookingId);
+                    ViewBag.CurrentBooking = targetBooking;
+
                     var selectedInvoice = await _invoiceRepository.GetInvoiceByBookingIdAsync(targetBookingId);
                     if (selectedInvoice == null)
                     {
                         // Nếu chưa có dòng hóa đơn trong DB, tự động tạo hóa đơn hiển thị tạm thời từ booking
-                        var targetBooking = roomBookings.FirstOrDefault(b => b.BookingId == targetBookingId);
                         if (targetBooking != null)
                         {
                             selectedInvoice = new Invoice
@@ -134,6 +146,24 @@ namespace HotelManagement.Controllers
                     if (invoice == null)
                     {
                         ViewBag.ErrorMessage = "Không tìm thấy hóa đơn cho mã đặt phòng này.";
+                    }
+                    else
+                    {
+                        // Tìm thông tin booking để lấy danh sách người lưu trú
+                        try
+                        {
+                            foreach (var h in hotels)
+                            {
+                                var hBookings = await _bookingRepository.GetByHotelAsync(h.HotelId);
+                                var matched = hBookings.FirstOrDefault(b => b.BookingId == parsedGuid);
+                                if (matched != null)
+                                {
+                                    ViewBag.CurrentBooking = matched;
+                                    break;
+                                }
+                            }
+                        }
+                        catch { }
                     }
 
                     return View(invoice);

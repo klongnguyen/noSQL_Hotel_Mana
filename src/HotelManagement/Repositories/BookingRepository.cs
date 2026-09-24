@@ -22,7 +22,7 @@ public class BookingRepository : IBookingRepository
     {
         const string cql = """
             SELECT guest_id, check_in_date, booking_id, hotel_id, hotel_name,
-                   room_number, check_out_date, total_amount, status
+                   room_number, check_out_date, total_amount, status, num_occupants, occupants_json
             FROM bookings_by_guest
             WHERE guest_id = ?;
             """;
@@ -37,7 +37,7 @@ public class BookingRepository : IBookingRepository
     {
         const string cql = """
             SELECT hotel_id, check_in_date, booking_id, guest_id, guest_name,
-                   room_number, check_out_date, total_amount, status
+                   room_number, check_out_date, total_amount, status, num_occupants, occupants_json
             FROM bookings_by_hotel_date
             WHERE hotel_id = ?;
             """;
@@ -53,19 +53,21 @@ public class BookingRepository : IBookingRepository
         // CQL date -> Cassandra.LocalDate.
         var checkIn = ToLocalDate(booking.CheckInDate);
         var checkOut = ToLocalDate(booking.CheckOutDate);
+        var occupantsJson = string.IsNullOrWhiteSpace(booking.OccupantsJson) ? "[]" : booking.OccupantsJson;
+        var numOccupants = booking.NumberOfOccupants > 0 ? booking.NumberOfOccupants : 1;
 
         var insertByGuest = await _context.Session.PrepareAsync("""
             INSERT INTO bookings_by_guest
             (guest_id, check_in_date, booking_id, hotel_id, hotel_name,
-             room_number, check_out_date, total_amount, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+             room_number, check_out_date, total_amount, status, num_occupants, occupants_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """);
 
         var insertByHotel = await _context.Session.PrepareAsync("""
             INSERT INTO bookings_by_hotel_date
             (hotel_id, check_in_date, booking_id, guest_id, guest_name,
-             room_number, check_out_date, total_amount, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+             room_number, check_out_date, total_amount, status, num_occupants, occupants_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """);
 
         // Dual-write: hai bản sao booking được lưu qua Logged Batch.
@@ -80,7 +82,9 @@ public class BookingRepository : IBookingRepository
                 booking.RoomNumber,
                 checkOut,
                 booking.TotalAmount,
-                "CONFIRMED"))
+                "CONFIRMED",
+                numOccupants,
+                occupantsJson))
             .Add(insertByHotel.Bind(
                 booking.HotelId,
                 checkIn,
@@ -90,7 +94,9 @@ public class BookingRepository : IBookingRepository
                 booking.RoomNumber,
                 checkOut,
                 booking.TotalAmount,
-                "CONFIRMED"));
+                "CONFIRMED",
+                numOccupants,
+                occupantsJson));
 
         // Chỉ chuyển trạng thái phòng sang OCCUPIED nếu đơn đặt phòng nhận phòng ngay hôm nay
         bool isOccupiedToday = booking.CheckInDate.Date <= DateTime.Today && booking.CheckOutDate.Date > DateTime.Today;
@@ -109,8 +115,8 @@ public class BookingRepository : IBookingRepository
 
             var insertOccupiedRoomStatus = await _context.Session.PrepareAsync("""
                 INSERT INTO rooms_by_hotel_status
-                (hotel_id, status, room_number, room_type, price_per_night)
-                VALUES (?, ?, ?, ?, ?);
+                (hotel_id, status, room_number, room_type, price_per_night, capacity)
+                VALUES (?, ?, ?, ?, ?, ?);
                 """);
 
             batch.Add(updateRoom.Bind(
@@ -126,7 +132,8 @@ public class BookingRepository : IBookingRepository
                     "OCCUPIED",
                     booking.RoomNumber,
                     booking.RoomType,
-                    booking.RoomPricePerNight));
+                    booking.RoomPricePerNight,
+                    booking.NumberOfOccupants > 1 ? booking.NumberOfOccupants : 2));
         }
 
         await _context.Session.ExecuteAsync(batch);
@@ -161,8 +168,8 @@ public class BookingRepository : IBookingRepository
 
         var insertAvailableRoomStatus = await _context.Session.PrepareAsync("""
             INSERT INTO rooms_by_hotel_status
-            (hotel_id, status, room_number, room_type, price_per_night)
-            VALUES (?, ?, ?, ?, ?);
+            (hotel_id, status, room_number, room_type, price_per_night, capacity)
+            VALUES (?, ?, ?, ?, ?, ?);
             """);
 
         // Hủy booking: cập nhật CANCELLED ở cả hai bảng denormalized
@@ -192,13 +199,16 @@ public class BookingRepository : IBookingRepository
                 "AVAILABLE",
                 booking.RoomNumber,
                 room.RoomType,
-                room.PricePerNight));
+                room.PricePerNight,
+                room.Capacity));
 
         await _context.Session.ExecuteAsync(batch);
     }
 
     private static Booking MapGuestBooking(Row row)
     {
+        var (numOccupants, occupantsJson, occupants) = ParseOccupants(row);
+
         return new Booking
         {
             BookingId = row.GetValue<Guid>("booking_id"),
@@ -209,12 +219,17 @@ public class BookingRepository : IBookingRepository
             CheckInDate = FromLocalDate(row.GetValue<LocalDate>("check_in_date")),
             CheckOutDate = FromLocalDate(row.GetValue<LocalDate>("check_out_date")),
             TotalAmount = row.GetValue<decimal>("total_amount"),
-            Status = row.GetValue<string>("status")
+            Status = row.GetValue<string>("status"),
+            NumberOfOccupants = numOccupants,
+            OccupantsJson = occupantsJson,
+            Occupants = occupants
         };
     }
 
     private static Booking MapHotelBooking(Row row)
     {
+        var (numOccupants, occupantsJson, occupants) = ParseOccupants(row);
+
         return new Booking
         {
             BookingId = row.GetValue<Guid>("booking_id"),
@@ -225,8 +240,46 @@ public class BookingRepository : IBookingRepository
             RoomNumber = row.GetValue<int>("room_number"),
             CheckOutDate = FromLocalDate(row.GetValue<LocalDate>("check_out_date")),
             TotalAmount = row.GetValue<decimal>("total_amount"),
-            Status = row.GetValue<string>("status")
+            Status = row.GetValue<string>("status"),
+            NumberOfOccupants = numOccupants,
+            OccupantsJson = occupantsJson,
+            Occupants = occupants
         };
+    }
+
+    private static (int numOccupants, string occupantsJson, List<RoomOccupant> occupants) ParseOccupants(Row row)
+    {
+        int numOccupants = 1;
+        try
+        {
+            if (row.GetColumn("num_occupants") != null && !row.IsNull("num_occupants"))
+            {
+                numOccupants = row.GetValue<int>("num_occupants");
+            }
+        }
+        catch { }
+
+        string occupantsJson = "[]";
+        try
+        {
+            if (row.GetColumn("occupants_json") != null && !row.IsNull("occupants_json"))
+            {
+                occupantsJson = row.GetValue<string>("occupants_json") ?? "[]";
+            }
+        }
+        catch { }
+
+        var occupants = new List<RoomOccupant>();
+        if (!string.IsNullOrWhiteSpace(occupantsJson) && occupantsJson != "[]")
+        {
+            try
+            {
+                occupants = System.Text.Json.JsonSerializer.Deserialize<List<RoomOccupant>>(occupantsJson) ?? new();
+            }
+            catch { }
+        }
+
+        return (numOccupants, occupantsJson, occupants);
     }
 
     private static LocalDate ToLocalDate(DateTime date)

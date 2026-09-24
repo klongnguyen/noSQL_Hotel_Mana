@@ -7,8 +7,8 @@ namespace HotelManagement.Data;
 
 public class CassandraContext : ICassandraContext
 {
-    private readonly ICluster _cluster;
-    private readonly ISession _session;
+    private readonly ICluster _cluster = null!;
+    private readonly ISession _session = null!;
     private readonly ILogger<CassandraContext> _logger;
     private readonly string _keyspace;
     private bool _disposed;
@@ -48,31 +48,48 @@ public class CassandraContext : ICassandraContext
 
         _logger.LogInformation("Đang khởi tạo kết nối Cassandra Astra DB... Bundle: {BundlePath}, Keyspace: {Keyspace}", bundlePath, _keyspace);
 
-        try
+        int maxRetries = 3;
+        for (int attempt = 1; attempt <= maxRetries; attempt++)
         {
-            _cluster = Cassandra.Cluster.Builder()
-                .WithCloudSecureConnectionBundle(bundlePath)
-                .WithCredentials("token", token)
-                .Build();
-
-            _session = _cluster.Connect(_keyspace);
-
-            // Kiểm tra version Cassandra
             try
             {
-                var row = _session.Execute("SELECT release_version FROM system.local").FirstOrDefault();
-                _releaseVersion = row?.GetValue<string>("release_version") ?? "Unknown";
-                _logger.LogInformation("Kết nối Astra DB thành công! Cassandra Version: {ReleaseVersion}", _releaseVersion);
+                _cluster = Cassandra.Cluster.Builder()
+                    .WithCloudSecureConnectionBundle(bundlePath)
+                    .WithCredentials("token", token)
+                    .WithSocketOptions(new SocketOptions()
+                        .SetConnectTimeoutMillis(30000)
+                        .SetReadTimeoutMillis(30000))
+                    .Build();
+
+                _session = _cluster.Connect(_keyspace);
+
+                // Kiểm tra version Cassandra
+                try
+                {
+                    var row = _session.Execute("SELECT release_version FROM system.local").FirstOrDefault();
+                    _releaseVersion = row?.GetValue<string>("release_version") ?? "Unknown";
+                    _logger.LogInformation("Kết nối Astra DB thành công! Cassandra Version: {ReleaseVersion}", _releaseVersion);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Kết nối thành công nhưng không lấy được release_version từ system.local");
+                }
+
+                break;
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Kết nối thành công nhưng không lấy được release_version từ system.local");
+                if (attempt < maxRetries)
+                {
+                    _logger.LogWarning(ex, "Thử kết nối lại Astra DB (Lần {Attempt}/{MaxRetries}) sau lỗi tạm thời...", attempt, maxRetries);
+                    Thread.Sleep(2000);
+                }
+                else
+                {
+                    _logger.LogError(ex, "Lỗi nghiêm trọng khi kết nối tới DataStax Astra DB sau {MaxRetries} lần thử.", maxRetries);
+                    throw;
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Lỗi nghiêm trọng khi kết nối tới DataStax Astra DB.");
-            throw;
         }
     }
 

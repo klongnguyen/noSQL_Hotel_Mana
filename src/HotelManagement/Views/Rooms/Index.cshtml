@@ -147,9 +147,10 @@
                 <thead class="bg-light text-secondary small text-uppercase fw-semibold">
                     <tr>
                         <th style="width: 60px;" class="text-center">#</th>
-                        <th style="width: 140px;">Số Phòng</th>
+                        <th style="width: 130px;">Số Phòng</th>
                         <th>Hạng Phòng</th>
-                        <th style="width: 220px;">Đơn Giá Mỗi Đêm</th>
+                        <th style="width: 150px;">Sức Chứa</th>
+                        <th style="width: 180px;">Đơn Giá Mỗi Đêm</th>
                         <th style="width: 220px;" class="text-end pe-4">Thao Tác</th>
                     </tr>
                 </thead>
@@ -171,6 +172,11 @@
                                         @room.RoomType
                                     </div>
                                     <small class="text-muted font-monospace">@room.HotelId</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border px-2 py-1">
+                                        <i class="bi bi-people me-1"></i>Tối đa @room.Capacity người
+                                    </span>
                                 </td>
                                 <td>
                                     <strong class="text-dark fs-6">@room.PriceFormatted</strong>

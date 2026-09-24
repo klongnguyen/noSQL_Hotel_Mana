@@ -19,4 +19,19 @@ public class Booking
 
     public decimal TotalAmount { get; set; }
     public string Status { get; set; } = "CONFIRMED";
+
+    /// <summary>
+    /// Số lượng người lưu trú trong phòng
+    /// </summary>
+    public int NumberOfOccupants { get; set; } = 1;
+
+    /// <summary>
+    /// Danh sách người lưu trú (gồm người đại diện và người ở cùng)
+    /// </summary>
+    public List<RoomOccupant> Occupants { get; set; } = new();
+
+    /// <summary>
+    /// Dữ liệu JSON lưu vào Cassandra table (occupants_json)
+    /// </summary>
+    public string OccupantsJson { get; set; } = "[]";
 }

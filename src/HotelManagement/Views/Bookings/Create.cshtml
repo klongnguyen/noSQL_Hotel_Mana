@@ -89,7 +89,7 @@
                     <datalist id="guestList">
                         @foreach (var g in guests)
                         {
-                            <option value="@g.GuestId" data-name="@g.FullName" data-phone="@g.Phone" data-email="@g.Email">
+                            <option value="@g.GuestId" data-name="@g.FullName" data-phone="@g.Phone" data-email="@g.Email" data-nationalid="@g.NationalId">
                                 @g.GuestId - @g.FullName (@g.Phone)
                             </option>
                         }
@@ -160,14 +160,58 @@
                                         data-type="@r.RoomType" 
                                         data-price="@r.PricePerNight" 
                                         data-status="@r.Status"
+                                        data-capacity="@r.Capacity"
                                         selected="@(r.RoomNumber == Model.RoomNumber)">
-                                    Phòng @r.RoomNumber - Loại @r.RoomType (@r.PricePerNight.ToString("N0") ₫/đêm) - [@r.StatusDisplay]
+                                    Phòng @r.RoomNumber - Hạng @r.RoomType (Tối đa @r.Capacity người)
                                 </option>
                             }
                         </select>
                     </div>
-                    <div class="form-text text-muted small">
-                        Danh sách buồng phòng tự động đồng bộ theo chi nhánh được chọn
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <div class="form-text text-muted small">
+                            Danh sách buồng phòng tự động đồng bộ theo chi nhánh được chọn
+                        </div>
+                        <div class="small">
+                            <span class="badge bg-dark text-white px-2 py-1" id="roomCapacityBadge">
+                                <i class="bi bi-people-fill me-1"></i>Sức chứa tối đa: 2 người
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Số Lượng Khách Lưu Trú & Thông Tin Người Ở Cùng -->
+                <div class="col-md-12">
+                    <div class="p-3 bg-light border rounded-3">
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-7">
+                                <h6 class="fw-bold text-dark mb-1">
+                                    <i class="bi bi-person-lines-fill text-dark me-2"></i>Số Lượng Khách Lưu Trú & Khai Báo Ở Cùng
+                                </h6>
+                                <p class="small text-muted mb-0">
+                                    Người thứ nhất là đại diện đặt phòng; các thành viên ở cùng chỉ cần Họ tên và CCCD/CMND (không cần đăng ký tài khoản).
+                                </p>
+                            </div>
+                            <div class="col-md-5 text-md-end mt-2 mt-md-0">
+                                <div class="d-inline-flex align-items-center gap-2">
+                                    <label asp-for="NumberOfOccupants" class="small fw-bold text-dark text-nowrap mb-0">
+                                        Số người ở:
+                                    </label>
+                                    <select asp-for="NumberOfOccupants" id="occupantCountSelect" class="form-select form-select-sm mono-form-control" style="width: 130px;">
+                                        <option value="1">1 người</option>
+                                        <option value="2">2 người</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Danh sách chi tiết người ở cùng phòng -->
+                        <div id="occupantsContainer" class="d-flex flex-column gap-2">
+                            <!-- Sẽ được JavaScript tự động tạo các dòng nhập -->
+                        </div>
+                        
+                        <div id="occupantsErrorAlert" class="alert alert-danger small py-2 px-3 mt-2 d-none">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Vui lòng nhập đầy đủ Họ và tên và CCCD/CMND cho tất cả người ở cùng phòng.
+                        </div>
                     </div>
                 </div>
 
@@ -310,6 +354,16 @@
             const nightsCountText = document.getElementById("nightsCountText");
             const totalAmountText = document.getElementById("totalAmountText");
 
+            // Phần quản lý sức chứa và người ở cùng
+            const roomCapacityBadge = document.getElementById("roomCapacityBadge");
+            const occupantCountSelect = document.getElementById("occupantCountSelect");
+            const occupantsContainer = document.getElementById("occupantsContainer");
+            const occupantsErrorAlert = document.getElementById("occupantsErrorAlert");
+
+            let primaryGuestName = "";
+            let primaryGuestCid = "";
+            let currentMaxCapacity = 2;
+
             let currentBookedRanges = [];
             let fpCheckIn = null;
             let fpCheckOut = null;
@@ -330,22 +384,40 @@
                 });
 
                 if (found) {
-                    guestNameText.textContent = found.getAttribute("data-name") || "Khách Hàng";
+                    primaryGuestName = found.getAttribute("data-name") || "Khách Hàng";
+                    primaryGuestCid = found.getAttribute("data-nationalid") || found.value || "";
+                    guestNameText.textContent = primaryGuestName;
                     guestPhoneText.textContent = "| SĐT: " + (found.getAttribute("data-phone") || "N/A");
                     guestInfoBox.classList.remove("d-none");
                     guestErrorBox.classList.add("d-none");
                 } else if (val.length > 0) {
+                    primaryGuestName = val;
+                    primaryGuestCid = val;
                     guestInfoBox.classList.add("d-none");
                     guestErrorBox.classList.remove("d-none");
                 } else {
+                    primaryGuestName = "";
+                    primaryGuestCid = "";
                     guestInfoBox.classList.add("d-none");
                     guestErrorBox.classList.add("d-none");
                 }
+                updatePrimaryOccupantDisplay();
+            }
+
+            function updatePrimaryOccupantDisplay() {
+                const nameElem = document.getElementById("occupant_primary_name");
+                const cidElem = document.getElementById("occupant_primary_cid");
+                const hiddenName = document.getElementById("hidden_primary_fullname");
+                const hiddenCid = document.getElementById("hidden_primary_cid");
+
+                if (nameElem) nameElem.textContent = primaryGuestName || "Chưa chọn khách";
+                if (cidElem) cidElem.textContent = primaryGuestCid ? `CCCD: ${primaryGuestCid}` : "";
+                if (hiddenName) hiddenName.value = primaryGuestName || "";
+                if (hiddenCid) hiddenCid.value = primaryGuestCid || "";
             }
 
             guestInput.addEventListener("input", updateGuestInfo);
             guestInput.addEventListener("change", updateGuestInfo);
-            updateGuestInfo();
 
             // 3. Validate & hiển thị thông tin Khách Sạn từ Datalist
             function updateHotelInfo() {
@@ -376,7 +448,6 @@
 
             hotelInput.addEventListener("input", updateHotelInfo);
             hotelInput.addEventListener("change", updateHotelInfo);
-            updateHotelInfo();
 
             // 4. Nạp danh sách phòng qua AJAX khi đổi khách sạn
             async function loadRoomsForHotel(hotelId) {
@@ -400,8 +471,8 @@
                             opt.setAttribute("data-type", r.roomType);
                             opt.setAttribute("data-price", r.pricePerNight);
                             opt.setAttribute("data-status", r.status);
-                            const statusText = r.status === 'AVAILABLE' ? 'Sẵn sàng' : (r.status === 'OCCUPIED' ? 'Có khách' : 'Bảo trì');
-                            opt.textContent = `Phòng ${r.roomNumber} - Loại ${r.roomType} (${formatVND(r.pricePerNight)}/đêm) - [${statusText}]`;
+                            opt.setAttribute("data-capacity", r.capacity || 2);
+                            opt.textContent = `Phòng ${r.roomNumber} - Hạng ${r.roomType} (Tối đa ${r.capacity || 2} người)`;
                             if (r.roomNumber.toString() === currentSelectedRoom) {
                                 opt.selected = true;
                             }
@@ -416,11 +487,115 @@
                 }
             }
 
-            // 5. Khi chọn phòng khác: lấy danh sách lịch đã book & cập nhật Flatpickr
+            // 5. Cập nhật sức chứa phòng & các ô nhập người ở cùng
+            function updateOccupantCountOptions(capacity) {
+                currentMaxCapacity = capacity;
+                if (roomCapacityBadge) {
+                    roomCapacityBadge.innerHTML = `<i class="bi bi-people-fill me-1"></i>Sức chứa tối đa: ${capacity} người`;
+                }
+
+                let currentVal = parseInt(occupantCountSelect.value, 10) || 1;
+                if (currentVal > capacity) currentVal = capacity;
+                if (currentVal < 1) currentVal = 1;
+
+                occupantCountSelect.innerHTML = "";
+                for (let i = 1; i <= capacity; i++) {
+                    const opt = document.createElement("option");
+                    opt.value = i;
+                    opt.textContent = `${i} người ${i === capacity ? '(Tối đa)' : ''}`;
+                    if (i === currentVal) opt.selected = true;
+                    occupantCountSelect.appendChild(opt);
+                }
+
+                renderOccupants();
+            }
+
+            function renderOccupants() {
+                const count = parseInt(occupantCountSelect.value, 10) || 1;
+                
+                // Lưu tạm thông tin đang nhập để khi đổi số lượng không mất
+                const existingData = [];
+                for (let i = 1; i <= 10; i++) {
+                    const fn = document.getElementById(`occ_fn_${i}`);
+                    const cid = document.getElementById(`occ_cid_${i}`);
+                    const dob = document.getElementById(`occ_dob_${i}`);
+                    if (fn || cid) {
+                        existingData[i] = {
+                            fullName: fn ? fn.value : "",
+                            citizenId: cid ? cid.value : "",
+                            dob: dob ? dob.value : ""
+                        };
+                    }
+                }
+
+                occupantsContainer.innerHTML = "";
+
+                // Dòng 1: Khách chính (Đại diện)
+                const p1 = document.createElement("div");
+                p1.className = "p-2 bg-white border rounded d-flex justify-content-between align-items-center";
+                p1.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-dark px-2 py-1"><i class="bi bi-star-fill me-1 text-warning"></i>Khách chính (Đại diện)</span>
+                        <div>
+                            <strong class="text-dark" id="occupant_primary_name">${primaryGuestName || "Chưa chọn khách"}</strong>
+                            <span class="text-muted small ms-2" id="occupant_primary_cid">${primaryGuestCid ? `CCCD: ${primaryGuestCid}` : ''}</span>
+                        </div>
+                    </div>
+                    <input type="hidden" name="Occupants[0].FullName" id="hidden_primary_fullname" value="${primaryGuestName || ''}" />
+                    <input type="hidden" name="Occupants[0].CitizenId" id="hidden_primary_cid" value="${primaryGuestCid || ''}" />
+                    <input type="hidden" name="Occupants[0].IsPrimary" value="true" />
+                    <span class="badge bg-success-subtle text-success border border-success-subtle small"><i class="bi bi-shield-check me-1"></i>Chủ đơn</span>
+                `;
+                occupantsContainer.appendChild(p1);
+
+                // Dòng 2..count: Người ở cùng phòng
+                for (let i = 1; i < count; i++) {
+                    const rowData = existingData[i] || { fullName: "", citizenId: "", dob: "" };
+                    const card = document.createElement("div");
+                    card.className = "p-3 bg-white border rounded";
+                    card.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-secondary text-white"><i class="bi bi-person me-1"></i>Người ở cùng #${i + 1}</span>
+                            <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>Khai báo lưu trú</span>
+                        </div>
+                        <input type="hidden" name="Occupants[${i}].IsPrimary" value="false" />
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Họ và tên <span class="text-danger">*</span></label>
+                                <input type="text" name="Occupants[${i}].FullName" id="occ_fn_${i}" value="${rowData.fullName}" 
+                                       class="form-control form-control-sm mono-form-control" placeholder="Ví dụ: Trần Thị B..." required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Số CCCD / CMND <span class="text-danger">*</span></label>
+                                <input type="text" name="Occupants[${i}].CitizenId" id="occ_cid_${i}" value="${rowData.citizenId}" 
+                                       class="form-control form-control-sm mono-form-control font-monospace" placeholder="12 chữ số..." required />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Ngày sinh</label>
+                                <input type="date" name="Occupants[${i}].DateOfBirth" id="occ_dob_${i}" value="${rowData.dob}" 
+                                       class="form-control form-control-sm mono-form-control" />
+                            </div>
+                        </div>
+                    `;
+                    occupantsContainer.appendChild(card);
+                }
+
+                if (count <= 1) {
+                    occupantsErrorAlert.classList.add("d-none");
+                }
+            }
+
+            occupantCountSelect.addEventListener("change", renderOccupants);
+
+            // 6. Khi chọn phòng khác: lấy danh sách lịch đã book & cập nhật Flatpickr + Sức chứa
             async function onRoomChanged() {
                 const hotelId = (hotelInput.value || "").trim();
                 const roomNumber = roomSelect.value;
                 updatePriceCalculation();
+
+                const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+                const capacity = selectedOption ? parseInt(selectedOption.getAttribute("data-capacity") || "2", 10) : 2;
+                updateOccupantCountOptions(capacity);
 
                 if (!hotelId || !roomNumber) {
                     currentBookedRanges = [];
@@ -490,11 +665,9 @@
 
             roomSelect.addEventListener("change", onRoomChanged);
 
-            // 6. Khởi tạo Flatpickr với tính năng làm mờ ngày bận & chỉ cho chọn ngày sáng
+            // 7. Khởi tạo Flatpickr với tính năng làm mờ ngày bận & chỉ cho chọn ngày sáng
             function initFlatpickr(bookedRanges) {
                 const disabledConfig = bookedRanges.map(r => {
-                    // Check-out là ngày khách trả phòng trước 12h, khách mới có thể nhận phòng lúc 14h.
-                    // Do đó các ngày bị khóa đầy đủ là từ checkIn đến ngày trước checkOut.
                     const dEnd = new Date(r.to);
                     dEnd.setDate(dEnd.getDate() - 1);
                     return {
@@ -517,7 +690,6 @@
                             minCheckOut.setDate(minCheckOut.getDate() + 1);
                             fpCheckOut.set("minDate", minCheckOut);
 
-                            // Nếu checkOut hiện tại <= checkIn, tự động đẩy checkOut lên +1 ngày
                             if (fpCheckOut.selectedDates.length > 0 && fpCheckOut.selectedDates[0] <= selectedDates[0]) {
                                 fpCheckOut.setDate(minCheckOut);
                             }
@@ -538,7 +710,7 @@
                 });
             }
 
-            // 7. Kiểm tra tính liên tục của ngày đặt (Không bị gián đoạn bởi đơn đặt giữa chừng)
+            // 8. Kiểm tra tính liên tục của ngày đặt (Không bị gián đoạn bởi đơn đặt giữa chừng)
             function validateDatesContinuity() {
                 const inStr = checkInInput.value;
                 const outStr = checkOutInput.value;
@@ -556,13 +728,11 @@
                     return false;
                 }
 
-                // Kiểm tra overlap với toàn bộ các đơn hiện có của phòng
                 let conflict = null;
                 for (const r of currentBookedRanges) {
                     const bIn = new Date(r.from);
                     const bOut = new Date(r.to);
 
-                    // Điều kiện xung đột giao thoa thời gian
                     if (checkInDate < bOut && checkOutDate > bIn) {
                         conflict = r;
                         break;
@@ -593,7 +763,7 @@
                 submitBtn.classList.remove("opacity-50");
             }
 
-            // 8. Tự động tính tiền theo giá phòng & số đêm
+            // 9. Tự động tính tiền theo giá phòng & số đêm
             function updatePriceCalculation() {
                 const selectedOption = roomSelect.options[roomSelect.selectedIndex];
                 const pricePerNight = selectedOption ? parseFloat(selectedOption.getAttribute("data-price") || 0) : 0;
@@ -621,16 +791,41 @@
                 }
             }
 
-            // Chặn submit nếu vi phạm tính liên tục hoặc mã không hợp lệ
+            // 10. Chặn submit nếu thiếu thông tin người ở cùng hoặc xung đột ngày
             document.getElementById("bookingForm").addEventListener("submit", function (e) {
                 if (!validateDatesContinuity()) {
                     e.preventDefault();
                     return false;
                 }
+
+                const count = parseInt(occupantCountSelect.value, 10) || 1;
+                if (count > 1) {
+                    let hasMissing = false;
+                    for (let i = 1; i < count; i++) {
+                        const fn = document.getElementById(`occ_fn_${i}`);
+                        const cid = document.getElementById(`occ_cid_${i}`);
+                        if (!fn || !fn.value.trim() || !cid || !cid.value.trim()) {
+                            hasMissing = true;
+                            if (fn && !fn.value.trim()) fn.focus();
+                            else if (cid && !cid.value.trim()) cid.focus();
+                            break;
+                        }
+                    }
+
+                    if (hasMissing) {
+                        e.preventDefault();
+                        occupantsErrorAlert.classList.remove("d-none");
+                        return false;
+                    }
+                }
+
+                occupantsErrorAlert.classList.add("d-none");
                 return true;
             });
 
-            // Khởi động nạp lịch lần đầu
+            // Khởi động nạp thông tin lần đầu
+            updateGuestInfo();
+            updateHotelInfo();
             onRoomChanged();
         });
     </script>

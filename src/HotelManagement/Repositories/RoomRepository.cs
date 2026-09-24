@@ -34,19 +34,19 @@ public class RoomRepository : IRoomRepository
             if (_getRoomsByHotelStmt == null)
             {
                 _getRoomsByHotelStmt = await _context.Session.PrepareAsync(
-                    "SELECT hotel_id, room_number, room_type, price_per_night, status FROM rooms_by_hotel WHERE hotel_id = ?;");
+                    "SELECT hotel_id, room_number, room_type, price_per_night, status, capacity FROM rooms_by_hotel WHERE hotel_id = ?;");
             }
 
             if (_getRoomByNumberStmt == null)
             {
                 _getRoomByNumberStmt = await _context.Session.PrepareAsync(
-                    "SELECT hotel_id, room_number, room_type, price_per_night, status FROM rooms_by_hotel WHERE hotel_id = ? AND room_number = ?;");
+                    "SELECT hotel_id, room_number, room_type, price_per_night, status, capacity FROM rooms_by_hotel WHERE hotel_id = ? AND room_number = ?;");
             }
 
             if (_getRoomsByStatusStmt == null)
             {
                 _getRoomsByStatusStmt = await _context.Session.PrepareAsync(
-                    "SELECT hotel_id, status, room_number, room_type, price_per_night FROM rooms_by_hotel_status WHERE hotel_id = ? AND status = ?;");
+                    "SELECT hotel_id, status, room_number, room_type, price_per_night, capacity FROM rooms_by_hotel_status WHERE hotel_id = ? AND status = ?;");
             }
         }
         catch (Exception ex)
@@ -115,13 +115,41 @@ public class RoomRepository : IRoomRepository
 
     private static Room MapRowToRoom(Row row)
     {
+        var roomType = row.IsNull("room_type") ? "Standard" : row.GetValue<string>("room_type");
+        int capacity = GetCapacityWithFallback(row, roomType);
+
         return new Room
         {
             HotelId = row.IsNull("hotel_id") ? string.Empty : row.GetValue<string>("hotel_id"),
             RoomNumber = row.IsNull("room_number") ? 0 : row.GetValue<int>("room_number"),
-            RoomType = row.IsNull("room_type") ? "Standard" : row.GetValue<string>("room_type"),
+            RoomType = roomType,
             PricePerNight = ParsePrice(row, "price_per_night"),
-            Status = row.IsNull("status") ? "AVAILABLE" : row.GetValue<string>("status")
+            Status = row.IsNull("status") ? "AVAILABLE" : row.GetValue<string>("status"),
+            Capacity = capacity
+        };
+    }
+
+    private static int GetCapacityWithFallback(Row row, string roomType)
+    {
+        try
+        {
+            if (row.GetColumn("capacity") != null && !row.IsNull("capacity"))
+            {
+                var val = row.GetValue<int>("capacity");
+                if (val > 0) return val;
+            }
+        }
+        catch
+        {
+            // Dự phòng an toàn nếu cột chưa được query hoặc chưa tạo
+        }
+
+        // Quy tắc chuẩn: Standard 2, Deluxe 3, Suite 4
+        return roomType.Trim().ToLowerInvariant() switch
+        {
+            "deluxe" => 3,
+            "suite" => 4,
+            _ => 2
         };
     }
 

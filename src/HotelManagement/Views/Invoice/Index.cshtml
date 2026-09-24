@@ -5,6 +5,7 @@
 @{
     ViewData["Title"] = "Hóa Đơn & Thanh Toán";
     var hotels = ViewBag.Hotels as IEnumerable<Hotel> ?? Enumerable.Empty<Hotel>();
+    var availableRooms = ViewBag.AvailableRooms as IEnumerable<Room> ?? Enumerable.Empty<Room>();
     var selectedHotelId = ViewBag.SelectedHotelId as string ?? "HTL001";
     var selectedRoomNumber = ViewBag.SelectedRoomNumber as int?;
     var bookingIdParam = ViewBag.BookingId as string ?? Context.Request.Query["bookingId"].ToString();
@@ -37,11 +38,11 @@
                 </button>
             </div>
 
-            <!-- Form chính: Chọn Khách sạn + Số phòng -->
+            <!-- Form chính: Chọn Khách sạn + Số phòng (Combobox chọn phòng bảo vệ NoSQL) -->
             <form method="get" action="/Invoice/Index" class="row g-2 align-items-end">
                 <div class="col-md-5 col-lg-4">
                     <label class="form-label small fw-bold text-secondary mb-1">Chi Nhánh Khách Sạn:</label>
-                    <select name="hotelId" class="form-select mono-form-control">
+                    <select name="hotelId" id="hotelSelect" class="form-select mono-form-control">
                         @foreach (var h in hotels)
                         {
                             <option value="@h.HotelId" selected="@(selectedHotelId == h.HotelId)">
@@ -50,11 +51,19 @@
                         }
                     </select>
                 </div>
-                <div class="col-md-4 col-lg-3">
+                <div class="col-md-5 col-lg-4">
                     <label class="form-label small fw-bold text-secondary mb-1">Số Phòng Cần Thanh Toán:</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-secondary-subtle font-monospace">P.</span>
-                        <input type="number" name="roomNumber" value="@(selectedRoomNumber.HasValue ? selectedRoomNumber.Value.ToString() : "")" class="form-control mono-form-control font-monospace" placeholder="VD: 101, 102..." min="1" required />
+                        <span class="input-group-text bg-light border-secondary-subtle"><i class="bi bi-door-closed text-secondary"></i></span>
+                        <select name="roomNumber" id="roomNumberSelect" class="form-select mono-form-control font-monospace" required>
+                            <option value="">-- Chọn số phòng --</option>
+                            @foreach (var rm in availableRooms)
+                            {
+                                <option value="@rm.RoomNumber" selected="@(selectedRoomNumber == rm.RoomNumber)">
+                                    P.@rm.RoomNumber — @rm.RoomType (@rm.PriceFormatted)
+                                </option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="col-auto">
@@ -208,6 +217,48 @@
                     </div>
                 </div>
 
+                @{
+                    var currBooking = ViewBag.CurrentBooking as HotelManagement.Models.Booking;
+                }
+                @if (currBooking != null)
+                {
+                    <div class="p-3 bg-light rounded-3 mb-4 border">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-sm-4">
+                                <small class="text-secondary text-uppercase fw-semibold d-block">Phòng Lưu Trú</small>
+                                <span class="fw-bold text-dark fs-6">Phòng @currBooking.RoomNumber</span> 
+                                <span class="text-secondary small">(@currBooking.RoomType)</span>
+                            </div>
+                            <div class="col-sm-4">
+                                <small class="text-secondary text-uppercase fw-semibold d-block">Thời Gian Lưu Trú</small>
+                                <span class="small fw-semibold text-dark">@currBooking.CheckInDate.ToString("dd/MM/yyyy") &rarr; @currBooking.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="col-sm-4 text-sm-end">
+                                <small class="text-secondary text-uppercase fw-semibold d-block">Số Lượng Khách</small>
+                                <span class="badge bg-dark text-white"><i class="bi bi-people-fill me-1"></i>@(currBooking.NumberOfOccupants > 0 ? currBooking.NumberOfOccupants : 1) người</span>
+                            </div>
+                        </div>
+
+                        @if (currBooking.Occupants != null && currBooking.Occupants.Count > 1)
+                        {
+                            <div class="mt-2 pt-2 border-top small text-secondary">
+                                <strong class="text-dark"><i class="bi bi-person-lines-fill me-1"></i>Danh sách người cùng lưu trú:</strong>
+                                <ul class="list-inline mb-0 mt-1">
+                                    @for (int i = 0; i < currBooking.Occupants.Count; i++)
+                                    {
+                                        var occ = currBooking.Occupants[i];
+                                        <li class="list-inline-item me-3">
+                                            @(i + 1). <strong class="text-dark">@occ.FullName</strong> 
+                                            @(string.IsNullOrWhiteSpace(occ.CitizenId) ? "" : $"(CCCD: {occ.CitizenId})")
+                                            @(occ.IsPrimary ? " - Đại diện" : "")
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                }
+
                 <div class="table-responsive mb-4">
                     <table class="table align-middle">
                         <thead class="table-light text-secondary text-uppercase small">
@@ -274,8 +325,47 @@
             <div class="text-muted">
                 <i class="bi bi-door-open fs-1 d-block mb-3 text-dark"></i>
                 <h5 class="fw-bold text-dark">Tra cứu hóa đơn & thanh toán</h5>
-                <p class="small text-secondary mb-0">Chọn chi nhánh khách sạn và nhập số phòng để hiển thị hóa đơn thanh toán tương ứng.</p>
+                <p class="small text-secondary mb-0">Chọn chi nhánh khách sạn và chọn số phòng từ danh sách để hiển thị hóa đơn thanh toán tương ứng.</p>
             </div>
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hotelSelect = document.getElementById('hotelSelect');
+            const roomNumberSelect = document.getElementById('roomNumberSelect');
+
+            if (hotelSelect && roomNumberSelect) {
+                hotelSelect.addEventListener('change', async function () {
+                    const hotelId = this.value;
+                    if (!hotelId) return;
+
+                    roomNumberSelect.innerHTML = '<option value="">Đang nạp danh sách phòng...</option>';
+                    roomNumberSelect.disabled = true;
+
+                    try {
+                        const response = await fetch(`/Bookings/GetRooms?hotelId=${encodeURIComponent(hotelId)}`);
+                        if (!response.ok) throw new Error('Không thể nạp danh sách phòng');
+                        const rooms = await response.json();
+
+                        roomNumberSelect.innerHTML = '<option value="">-- Chọn số phòng --</option>';
+                        rooms.forEach(rm => {
+                            const opt = document.createElement('option');
+                            opt.value = rm.roomNumber;
+                            const priceFormatted = new Intl.NumberFormat('vi-VN').format(rm.pricePerNight) + ' VND';
+                            opt.textContent = `P.${rm.roomNumber} — ${rm.roomType} (${priceFormatted})`;
+                            roomNumberSelect.appendChild(opt);
+                        });
+                    } catch (err) {
+                        console.error('Lỗi khi tải phòng:', err);
+                        roomNumberSelect.innerHTML = '<option value="">Lỗi khi nạp phòng, vui lòng thử lại</option>';
+                    } finally {
+                        roomNumberSelect.disabled = false;
+                    }
+                });
+            }
+        });
+    </script>
+}

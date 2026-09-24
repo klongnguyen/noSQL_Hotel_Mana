@@ -117,7 +117,8 @@ public class BookingsController : Controller
                     roomNumber = r.RoomNumber,
                     roomType = r.RoomType,
                     pricePerNight = r.PricePerNight,
-                    status = r.Status
+                    status = r.Status,
+                    capacity = r.Capacity
                 });
             return Json(rooms);
         }
@@ -227,7 +228,67 @@ public class BookingsController : Controller
             ModelState.AddModelError(nameof(booking.RoomNumber), "Vui lòng chọn số phòng hợp lệ.");
         }
 
-        // 2. Kiểm tra xung đột lịch đặt phòng (Overlap Detection) bằng Cassandra table bookings_by_hotel_date
+        // 2. Validate Sức chứa phòng (Capacity Validation)
+        if (room != null)
+        {
+            if (booking.NumberOfOccupants <= 0)
+            {
+                booking.NumberOfOccupants = 1;
+            }
+
+            if (booking.NumberOfOccupants > room.Capacity)
+            {
+                ModelState.AddModelError(nameof(booking.NumberOfOccupants),
+                    $"Phòng {room.RoomNumber} ({room.RoomType}) chỉ chứa tối đa {room.Capacity} người. Bạn đang đăng ký {booking.NumberOfOccupants} người.");
+            }
+        }
+
+        // 3. Xử lý và Validate thông tin người ở cùng phòng (Occupants)
+        var validOccupants = new List<RoomOccupant>();
+        if (guest != null)
+        {
+            // Người đại diện (Người 1)
+            validOccupants.Add(new RoomOccupant
+            {
+                FullName = guest.FullName,
+                CitizenId = !string.IsNullOrWhiteSpace(guest.NationalId) ? guest.NationalId : guest.GuestId,
+                DateOfBirth = null,
+                IsPrimary = true
+            });
+
+            // Người ở cùng (Người 2..N)
+            if (booking.NumberOfOccupants > 1)
+            {
+                for (int i = 1; i < booking.NumberOfOccupants; i++)
+                {
+                    var occInput = (booking.Occupants != null && i < booking.Occupants.Count)
+                        ? booking.Occupants[i]
+                        : null;
+
+                    var occName = occInput?.FullName?.Trim() ?? string.Empty;
+                    var occCid = occInput?.CitizenId?.Trim() ?? string.Empty;
+
+                    if (string.IsNullOrWhiteSpace(occName))
+                    {
+                        ModelState.AddModelError($"Occupants[{i}].FullName", $"Vui lòng nhập Họ và tên cho người ở cùng thứ {i + 1}.");
+                    }
+                    if (string.IsNullOrWhiteSpace(occCid))
+                    {
+                        ModelState.AddModelError($"Occupants[{i}].CitizenId", $"Vui lòng nhập số CCCD/CMND cho người ở cùng thứ {i + 1}.");
+                    }
+
+                    validOccupants.Add(new RoomOccupant
+                    {
+                        FullName = occName,
+                        CitizenId = occCid,
+                        DateOfBirth = occInput?.DateOfBirth,
+                        IsPrimary = false
+                    });
+                }
+            }
+        }
+
+        // 4. Kiểm tra xung đột lịch đặt phòng (Overlap Detection) bằng Cassandra table bookings_by_hotel_date
         if (hotel != null && room != null && ModelState.IsValid)
         {
             var existingBookings = await _bookingRepository.GetByHotelAsync(booking.HotelId.Trim());
@@ -265,6 +326,8 @@ public class BookingsController : Controller
             booking.RoomPricePerNight = room.PricePerNight;
             booking.TotalAmount = room.PricePerNight * nights;
             booking.Status = "CONFIRMED";
+            booking.Occupants = validOccupants;
+            booking.OccupantsJson = System.Text.Json.JsonSerializer.Serialize(validOccupants);
 
             await _bookingRepository.CreateAsync(booking);
 
