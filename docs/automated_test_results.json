@@ -149,9 +149,9 @@
   {
     "id": "TC22",
     "module": "Hồ Sơ Khách Hàng",
-    "description": "Chi tiết khách hàng GUEST001",
-    "status": "FAIL",
-    "details": "Status: 404"
+    "description": "Xem chi tiết thông tin khách hàng GUEST001",
+    "status": "PASS",
+    "details": ""
   },
   {
     "id": "TC23",
@@ -170,14 +170,14 @@
   {
     "id": "TC25",
     "module": "Hồ Sơ Khách Hàng",
-    "description": "Validate trùng mã khách hàng",
-    "status": "FAIL",
-    "details": "Không báo lỗi trùng mã khách hàng"
+    "description": "Validate tạo khách hàng: Trùng khóa chính GuestId -> Bị chặn và báo lỗi",
+    "status": "PASS",
+    "details": ""
   },
   {
     "id": "TC26",
     "module": "Hồ Sơ Khách Hàng",
-    "description": "Tạo khách hàng mới thành công (GTEST_75332)",
+    "description": "Tạo khách hàng mới thành công (GTEST_75706)",
     "status": "PASS",
     "details": ""
   },
@@ -198,7 +198,7 @@
   {
     "id": "TC29",
     "module": "Hồ Sơ Khách Hàng",
-    "description": "Xóa hồ sơ khách hàng thử nghiệm (GTEST_75332)",
+    "description": "Xóa hồ sơ khách hàng thử nghiệm (GTEST_75706)",
     "status": "PASS",
     "details": ""
   },
@@ -275,7 +275,7 @@
   {
     "id": "TC40",
     "module": "Đặt Phòng (Bookings)",
-    "description": "Tạo đơn đặt phòng hợp lệ thành công (Booking: 8a569e8e-9f13-4e65-a345-38e35a962b8e)",
+    "description": "Tạo đơn đặt phòng hợp lệ thành công (Booking: 2ee3868f-99ac-488a-bdfd-425de160aa41)",
     "status": "PASS",
     "details": ""
   },
@@ -289,7 +289,7 @@
   {
     "id": "TC42",
     "module": "Đặt Phòng (Bookings)",
-    "description": "Hủy đơn đặt phòng thành công (8a569e8e-9f13-4e65-a345-38e35a962b8e)",
+    "description": "Hủy đơn đặt phòng thành công (2ee3868f-99ac-488a-bdfd-425de160aa41)",
     "status": "PASS",
     "details": ""
   },
