@@ -21,10 +21,6 @@ public class RoomsController : Controller
         _logger = logger;
     }
 
-    /// <summary>
-    /// Trang quản lý và tra cứu danh sách phòng theo Khách sạn (Module M3 - STORY-104 & STORY-105)
-    /// Hỗ trợ lọc trạng thái (AVAILABLE, OCCUPIED, MAINTENANCE) thông qua bảng NoSQL rooms_by_hotel_status
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> Index(string? hotelId, string? status)
     {
@@ -59,7 +55,7 @@ public class RoomsController : Controller
             if (isFilteringStatus)
             {
                 var normStatus = status!.Trim().ToUpperInvariant();
-                // Query trực tiếp vào bảng chuyên dụng rooms_by_hotel_status (Chuẩn Query-First, KHÔNG dùng ALLOW FILTERING)
+                // Query trực tiếp vào bảng chuyên dụng rooms_by_hotel_statu
                 displayRooms = await _roomRepository.GetRoomsByStatusAsync(hotelId, normStatus);
                 querySourceTable = "rooms_by_hotel_status";
                 executedCql = $"SELECT hotel_id, status, room_number, room_type, price_per_night FROM rooms_by_hotel_status WHERE hotel_id = '{hotelId}' AND status = '{normStatus}';";

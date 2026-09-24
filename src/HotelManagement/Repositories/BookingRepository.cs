@@ -33,6 +33,21 @@ public class BookingRepository : IBookingRepository
         return rows.Select(MapGuestBooking).OrderByDescending(b => b.CheckInDate).ToList();
     }
 
+    public async Task<IEnumerable<Booking>> GetByHotelAsync(string hotelId)
+    {
+        const string cql = """
+            SELECT hotel_id, check_in_date, booking_id, guest_id, guest_name,
+                   room_number, check_out_date, total_amount, status
+            FROM bookings_by_hotel_date
+            WHERE hotel_id = ?;
+            """;
+
+        var rows = await _context.Session.ExecuteAsync(
+            new SimpleStatement(cql, hotelId));
+
+        return rows.Select(MapHotelBooking).OrderBy(b => b.CheckInDate).ToList();
+    }
+
     public async Task CreateAsync(Booking booking)
     {
         // CQL date -> Cassandra.LocalDate.
@@ -53,25 +68,7 @@ public class BookingRepository : IBookingRepository
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
             """);
 
-        var updateRoom = await _context.Session.PrepareAsync("""
-            UPDATE rooms_by_hotel
-            SET status = ?
-            WHERE hotel_id = ? AND room_number = ?;
-            """);
-
-        // rooms_by_hotel_status là bảng denormalized dùng cho truy vấn theo status.
-        var deleteAvailableRoomStatus = await _context.Session.PrepareAsync("""
-            DELETE FROM rooms_by_hotel_status
-            WHERE hotel_id = ? AND status = ? AND room_number = ?;
-            """);
-
-        var insertOccupiedRoomStatus = await _context.Session.PrepareAsync("""
-            INSERT INTO rooms_by_hotel_status
-            (hotel_id, status, room_number, room_type, price_per_night)
-            VALUES (?, ?, ?, ?, ?);
-            """);
-
-        // Dual-write: hai bản sao booking + trạng thái phòng được gửi trong cùng BatchStatement.
+        // Dual-write: hai bản sao booking được lưu qua Logged Batch.
         var batch = new BatchStatement()
             .SetBatchType(BatchType.Logged)
             .Add(insertByGuest.Bind(
@@ -93,21 +90,44 @@ public class BookingRepository : IBookingRepository
                 booking.RoomNumber,
                 checkOut,
                 booking.TotalAmount,
-                "CONFIRMED"))
-            .Add(updateRoom.Bind(
-                "OCCUPIED",
-                booking.HotelId,
-                booking.RoomNumber))
-            .Add(deleteAvailableRoomStatus.Bind(
-                booking.HotelId,
-                "AVAILABLE",
-                booking.RoomNumber))
-            .Add(insertOccupiedRoomStatus.Bind(
-                booking.HotelId,
-                "OCCUPIED",
-                booking.RoomNumber,
-                booking.RoomType,
-                booking.RoomPricePerNight));
+                "CONFIRMED"));
+
+        // Chỉ chuyển trạng thái phòng sang OCCUPIED nếu đơn đặt phòng nhận phòng ngay hôm nay
+        bool isOccupiedToday = booking.CheckInDate.Date <= DateTime.Today && booking.CheckOutDate.Date > DateTime.Today;
+        if (isOccupiedToday)
+        {
+            var updateRoom = await _context.Session.PrepareAsync("""
+                UPDATE rooms_by_hotel
+                SET status = ?
+                WHERE hotel_id = ? AND room_number = ?;
+                """);
+
+            var deleteAvailableRoomStatus = await _context.Session.PrepareAsync("""
+                DELETE FROM rooms_by_hotel_status
+                WHERE hotel_id = ? AND status = ? AND room_number = ?;
+                """);
+
+            var insertOccupiedRoomStatus = await _context.Session.PrepareAsync("""
+                INSERT INTO rooms_by_hotel_status
+                (hotel_id, status, room_number, room_type, price_per_night)
+                VALUES (?, ?, ?, ?, ?);
+                """);
+
+            batch.Add(updateRoom.Bind(
+                    "OCCUPIED",
+                    booking.HotelId,
+                    booking.RoomNumber))
+                .Add(deleteAvailableRoomStatus.Bind(
+                    booking.HotelId,
+                    "AVAILABLE",
+                    booking.RoomNumber))
+                .Add(insertOccupiedRoomStatus.Bind(
+                    booking.HotelId,
+                    "OCCUPIED",
+                    booking.RoomNumber,
+                    booking.RoomType,
+                    booking.RoomPricePerNight));
+        }
 
         await _context.Session.ExecuteAsync(batch);
     }
@@ -187,6 +207,22 @@ public class BookingRepository : IBookingRepository
             HotelName = row.GetValue<string>("hotel_name"),
             RoomNumber = row.GetValue<int>("room_number"),
             CheckInDate = FromLocalDate(row.GetValue<LocalDate>("check_in_date")),
+            CheckOutDate = FromLocalDate(row.GetValue<LocalDate>("check_out_date")),
+            TotalAmount = row.GetValue<decimal>("total_amount"),
+            Status = row.GetValue<string>("status")
+        };
+    }
+
+    private static Booking MapHotelBooking(Row row)
+    {
+        return new Booking
+        {
+            BookingId = row.GetValue<Guid>("booking_id"),
+            HotelId = row.GetValue<string>("hotel_id"),
+            CheckInDate = FromLocalDate(row.GetValue<LocalDate>("check_in_date")),
+            GuestId = row.GetValue<string>("guest_id"),
+            GuestName = row.GetValue<string>("guest_name"),
+            RoomNumber = row.GetValue<int>("room_number"),
             CheckOutDate = FromLocalDate(row.GetValue<LocalDate>("check_out_date")),
             TotalAmount = row.GetValue<decimal>("total_amount"),
             Status = row.GetValue<string>("status")
