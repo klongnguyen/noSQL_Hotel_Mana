@@ -22,6 +22,52 @@
         </div>
     </div>
 
+    <!-- THANH TÌM KIẾM KHÁCH HÀNG (TASK-106) -->
+    <div class="mono-card mb-4">
+        <div class="card-body p-3 p-md-4">
+            <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                <div class="col-md-7 col-lg-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-secondary-subtle">
+                            <i class="bi bi-search text-secondary"></i>
+                        </span>
+                        <input type="text" 
+                               name="searchTerm" 
+                               value="@ViewBag.SearchTerm" 
+                               class="form-control mono-form-control" 
+                               placeholder="Tìm theo Mã khách hàng (VD: GUEST001) hoặc Số điện thoại, Họ tên..." 
+                               autocomplete="off" />
+                    </div>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    <button type="submit" class="btn mono-btn-dark fw-semibold px-4">
+                        <i class="bi bi-search me-1"></i> Tìm Kiếm
+                    </button>
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.SearchTerm as string))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                            <i class="bi bi-x-circle me-1"></i> Xóa Bộ Lọc
+                        </a>
+                    }
+                </div>
+            </form>
+
+            @if (!string.IsNullOrWhiteSpace(ViewBag.SearchTerm as string))
+            {
+                <div class="mt-3 pt-3 border-top d-flex flex-wrap align-items-center justify-content-between text-muted small gap-2">
+                    <div>
+                        <i class="bi bi-funnel-fill text-dark me-1"></i>
+                        Kết quả lọc theo từ khóa: <strong class="text-dark font-monospace">"@ViewBag.SearchTerm"</strong>
+                        <span class="badge bg-secondary-subtle text-dark border ms-2">Tìm thấy @Model.Count() khách hàng</span>
+                    </div>
+                    <a asp-action="Index" class="text-decoration-none text-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i> Xem tất cả danh sách
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
     <div class="mono-card overflow-hidden">
         <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
             <div class="fw-bold text-dark">
@@ -65,6 +111,9 @@
                         <td class="font-monospace small text-secondary">@guest.NationalId</td>
                         <td class="text-end pe-4">
                             <div class="btn-group btn-group-sm">
+                                <a asp-controller="BookingHistory" asp-action="Index" asp-route-customerId="@guest.GuestId" class="mono-btn-outline btn-sm" title="Lịch sử lưu trú">
+                                    <i class="bi bi-clock-history"></i> Lịch sử
+                                </a>
                                 <a asp-action="Details" asp-route-id="@guest.GuestId" class="mono-btn-outline btn-sm" title="Xem chi tiết">
                                     <i class="bi bi-eye"></i> Chi tiết
                                 </a>
@@ -83,7 +132,20 @@
                     <tr>
                         <td colspan="6" class="text-center py-5 text-muted">
                             <i class="bi bi-person-x fs-1 d-block mb-2 text-secondary"></i>
-                            Chưa có dữ liệu khách hàng trong hệ thống.
+                            @if (!string.IsNullOrWhiteSpace(ViewBag.SearchTerm as string))
+                            {
+                                <div class="fw-semibold text-dark">Không tìm thấy khách hàng nào khớp với từ khóa "@ViewBag.SearchTerm".</div>
+                                <div class="small text-secondary mt-1">Vui lòng kiểm tra lại mã khách hàng hoặc số điện thoại.</div>
+                                <div class="mt-3">
+                                    <a asp-action="Index" class="btn btn-sm mono-btn-dark">
+                                        <i class="bi bi-arrow-left me-1"></i> Xem lại tất cả khách hàng
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <span>Chưa có dữ liệu khách hàng trong hệ thống.</span>
+                            }
                         </td>
                     </tr>
                 }

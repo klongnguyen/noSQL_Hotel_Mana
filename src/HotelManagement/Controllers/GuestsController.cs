@@ -16,11 +16,22 @@ public class GuestsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? searchTerm)
     {
         try
         {
-            var guests = await _repository.GetAllAsync();
+            IEnumerable<Guest> guests;
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var term = searchTerm.Trim();
+                guests = await _repository.SearchAsync(term);
+                ViewBag.SearchTerm = term;
+            }
+            else
+            {
+                guests = await _repository.GetAllAsync();
+            }
+
             return View(guests.OrderBy(g => g.GuestId));
         }
         catch (Exception ex)

@@ -41,6 +41,32 @@ public class GuestRepository : IGuestRepository
         return row == null ? null : MapRow(row);
     }
 
+    public async Task<IEnumerable<Guest>> SearchAsync(string keyword)
+    {
+        if (string.IsNullOrWhiteSpace(keyword))
+        {
+            return await GetAllAsync();
+        }
+
+        var term = keyword.Trim();
+
+        // Nếu người dùng nhập đúng mã GuestId chính xác, thử tìm trực tiếp bằng Partition Key
+        var exactGuest = await GetByIdAsync(term);
+        if (exactGuest != null)
+        {
+            return new List<Guest> { exactGuest };
+        }
+
+        // Tìm kiếm đa năng theo mã khách hàng, số điện thoại, họ tên hoặc CCCD/CMND
+        var allGuests = await GetAllAsync();
+        return allGuests.Where(g =>
+            (!string.IsNullOrEmpty(g.GuestId) && g.GuestId.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+            (!string.IsNullOrEmpty(g.Phone) && g.Phone.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+            (!string.IsNullOrEmpty(g.FullName) && g.FullName.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+            (!string.IsNullOrEmpty(g.NationalId) && g.NationalId.Contains(term, StringComparison.OrdinalIgnoreCase))
+        ).ToList();
+    }
+
     public async Task CreateAsync(Guest guest)
     {
         const string cql = """

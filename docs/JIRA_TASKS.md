@@ -113,6 +113,23 @@ Tài liệu này được định dạng chuẩn Jira (Agile/Scrum), phân chia 
   - [x] Trang `/Guests/Create` thêm mới được khách hàng vào bảng `guests`.
   - [x] Dữ liệu có validate số điện thoại, email, CCCD/CMND (`citizen_id`).
 
+#### 🎫 Ticket: `TASK-106`
+- **Issue Type**: `Task`
+- **Summary**: Tìm kiếm khách hàng thông qua Mã khách hàng (GuestId) hoặc Số điện thoại (Phone)
+- **Assignee**: Thành viên 2
+- **Story Points**: `3` | **Priority**: `High`
+- **Cassandra Table**: `guests` (PK: `guest_id`)
+- **Description**:
+  - Bổ sung hàm `SearchAsync(string keyword)` trong `IGuestRepository.cs` và `GuestRepository.cs`.
+  - Hỗ trợ tra cứu chính xác theo Partition Key `guest_id` nếu người dùng nhập đúng mã.
+  - Hỗ trợ tra cứu tìm kiếm linh hoạt theo Số điện thoại (`phone`), Họ tên (`full_name`) và CCCD (`citizen_id`).
+  - Thêm form tìm kiếm chuyên nghiệp trên `Views/Guests/Index.cshtml` kèm nút Xóa bộ lọc và thông báo số lượng kết quả.
+  - Tích hợp nút xem nhanh Lịch sử lưu trú (`/BookingHistory?customerId={id}`) từ danh sách tìm kiếm.
+- **Acceptance Criteria (DoD)**:
+  - [x] Tìm kiếm chính xác hoặc gần đúng theo Mã khách hàng và Số điện thoại hoạt động tức thì.
+  - [x] Có nút Xóa bộ lọc khôi phục danh sách đầy đủ.
+  - [x] Hiển thị rõ số lượng kết quả tìm thấy và trạng thái rỗng thân thiện khi không có dữ liệu khớp.
+
 #### 🎫 Ticket: `STORY-202`
 - **Issue Type**: `Story`
 - **Summary**: Nghiệp vụ Đặt phòng với kỹ thuật Denormalization Dual-Write
